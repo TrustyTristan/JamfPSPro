@@ -33,7 +33,7 @@ function New-Jamf {
     )
     DynamicParam {
         $ValidOptions = @( Get-ValidOption -Method 'post' -Component $Component )
-        New-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1
+        Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1
     }
     BEGIN {
         $Path = $PSBoundParameters.Path
