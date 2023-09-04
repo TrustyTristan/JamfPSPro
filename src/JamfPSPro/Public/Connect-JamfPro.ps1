@@ -68,6 +68,9 @@ function Connect-JamfPro {
         # Check for existing session
         if ( $force -or (-not $TokenJamfPSPro.expires) -or ((Get-Date $TokenJamfPSPro.expires) -le ((Get-Date).AddMinutes(20))) ) {
 
+            if ( $TokenJamfPSPro.Credential ) {
+                $Credential = $TokenJamfPSPro.Credential
+            }
             while ( $Credential -eq [System.Management.Automation.PSCredential]::Empty ) {
                 $Credential = Get-Credential
             }
@@ -112,7 +115,7 @@ function Connect-JamfPro {
                 Write-Information "Trying $uri_KeepAlive"
                 $KeepAlive = Invoke-RestMethod $uri_KeepAlive -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method POST
                 $TokenJamfPSPro.token   = [ConvertToSS]::Set($TokenResult.Token)
-                $TokenJamfPSPro.expires = Get-Date $KeepAlive.expires
+                $TokenJamfPSPro.expires = (Get-Date $KeepAlive.expires).AddMinutes((Get-TimeZone).BaseUtcOffset.TotalMinutes)
                 Write-Information "Token expires: $($TokenJamfPSPro.expires)"
             } catch {
                 Write-Error "Trying $uri_KeepAlive"
