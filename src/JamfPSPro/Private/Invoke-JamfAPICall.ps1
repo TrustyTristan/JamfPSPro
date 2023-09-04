@@ -26,11 +26,10 @@ function Invoke-JamfAPICall {
 
     PROCESS {
         try {
-            $Response = Invoke-RestMethod $Path -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method $Method
-            return $Response.PSobject.Properties.Value
+            $Response = Invoke-RestMethod $Path -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method $Method -ErrorAction Stop
+            return ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
         } catch {
-            Write-Error "Invalid response from `'$Path`'"
-            Write-Error $_.Exception.Message
+            return "Invalid response from `'$Path`'`n$($_.Exception.Message)"
         }
     }
 }
