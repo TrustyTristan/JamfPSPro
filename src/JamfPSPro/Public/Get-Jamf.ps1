@@ -50,19 +50,33 @@ function Get-Jamf {
             }
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
-            return Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+            $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+            if ( $Result -match '^Invalid response from') {
+                Write-Error $Result
+            } else {
+                return $Result
+            }
         } elseif ( $Params.count -ge 1 ) {
             foreach ( $Param in $Params ) {
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
-                return Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
-                Clear-Variable -Name RestURL, Rest
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+                if ( $Result -match '^Invalid response from') {
+                    Write-Error $Result
+                } else {
+                    return $Result
+                }
             }
         } else {
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $PathDetails.URL -join '/'
-            return Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+            $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+            if ( $Result -match '^Invalid response from') {
+                Write-Error $Result
+            } else {
+                return $Result
+            }
         }
     }
 }
