@@ -36,6 +36,12 @@ function Get-Jamf {
         Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1
     }
     BEGIN {
+        if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.credential ) {
+            Connect-JamfPro -Server $TokenJamfPSPro.Server -Credential $TokenJamfPSPro.credential
+        } else {
+            Connect-JamfPro
+        }
+
         $Path = $PSBoundParameters.Path
         $PathDetails = $ValidOptions | Where-Object {$_.url -eq $Path}
         $ReplaceMatches = $PathDetails.URL | Select-String -Pattern '{.*?}' -AllMatches

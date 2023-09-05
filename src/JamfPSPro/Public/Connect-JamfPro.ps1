@@ -66,7 +66,7 @@ function Connect-JamfPro {
 
     PROCESS {
         # Check for existing session
-        if ( $force -or (-not $TokenJamfPSPro.expires) -or ((Get-Date $TokenJamfPSPro.expires) -le ((Get-Date).AddMinutes(20))) ) {
+        if ( $force -or (-not $TokenJamfPSPro.expires) ) {
 
             if ( $TokenJamfPSPro.Credential ) {
                 $Credential = $TokenJamfPSPro.Credential
@@ -83,8 +83,8 @@ function Connect-JamfPro {
             }
 
             $Token = [PSCustomObject]@{
-                token      = [ConvertToSS]::Set($TokenResult.Token);
-                expires    = Get-Date $TokenResult.expires;
+                token      = [ConvertToSS]::Set($TokenResult.Token)
+                expires    = (Get-Date $TokenResult.expires).AddMinutes((Get-TimeZone).BaseUtcOffset.TotalMinutes)
                 server     = $Server
                 credential = $Credential
             }
@@ -109,12 +109,12 @@ function Connect-JamfPro {
             }
             $ConnectionDetails | Format-Table
 
-        } else {
+        } elseif ( $TokenJamfPSPro.token -and ( (Get-Date $TokenJamfPSPro.expires) -le ((Get-Date).AddMinutes(20)) ) ) {
             Write-Information "Token Variable Found"
             try {
                 Write-Information "Trying $uri_KeepAlive"
                 $KeepAlive = Invoke-RestMethod $uri_KeepAlive -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method POST
-                $TokenJamfPSPro.token   = [ConvertToSS]::Set($TokenResult.Token)
+                $TokenJamfPSPro.token = [ConvertToSS]::Set($TokenResult.Token)
                 $TokenJamfPSPro.expires = (Get-Date $KeepAlive.expires).AddMinutes((Get-TimeZone).BaseUtcOffset.TotalMinutes)
                 Write-Information "Token expires: $($TokenJamfPSPro.expires)"
             } catch {
