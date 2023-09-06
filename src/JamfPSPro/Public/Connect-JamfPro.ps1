@@ -118,7 +118,6 @@ function Connect-JamfPro {
                 $TokenJamfPSPro.expires = (Get-Date $KeepAlive.expires).AddMinutes((Get-TimeZone).BaseUtcOffset.TotalMinutes)
                 Write-Information "Token expires: $($TokenJamfPSPro.expires)"
             } catch {
-                Write-Error "Trying $uri_KeepAlive"
                 if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.Credential ) {
                     Write-Information "Trying to connect again with stored details"
                     $TokenJamfPSPro.expires = $null

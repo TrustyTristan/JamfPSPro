@@ -26,6 +26,7 @@ function Invoke-JamfAPICall {
 
     PROCESS {
         try {
+            Write-Information "Uri: $Path"
             $Response = Invoke-RestMethod $Path -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method $Method -ErrorAction Stop
             return ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
         } catch {

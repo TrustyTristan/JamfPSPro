@@ -45,14 +45,20 @@ function Get-Jamf {
         $Path = $PSBoundParameters.Path
         $PathDetails = $ValidOptions | Where-Object {$_.url -eq $Path}
         $ReplaceMatches = $PathDetails.URL | Select-String -Pattern '{.*?}' -AllMatches
-        $replacementCounter = 0
+        $ReplacementCounter = 0
     }
 
     PROCESS {
-        if ( $ReplaceMatches.count -gt 1 ) {
+        if ( $ReplaceMatches.Matches.count -gt 1 ) {
+            Write-Information "Multi Param Path"
             foreach ( $replace in $ReplaceMatches.Matches.value ) {
-                $RestURL = $PathDetails.URL -replace $replace, $Params[$replacementCounter]
-                $replacementCounter++
+                if ( $ReplacementCounter -eq 0 ) {
+                    $RestURL = $PathDetails.URL -replace $replace, $Params[$ReplacementCounter]
+                    $ReplacementCounter++
+                } else {
+                    $RestURL = $RestURL -replace $replace, $Params[$ReplacementCounter]
+                    $ReplacementCounter++
+                }
             }
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
@@ -63,6 +69,7 @@ function Get-Jamf {
                 return $Result
             }
         } elseif ( $Params.count -ge 1 ) {
+            Write-Information "Multi Params"
             foreach ( $Param in $Params ) {
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
@@ -75,6 +82,7 @@ function Get-Jamf {
                 }
             }
         } else {
+            Write-Information "Single Param"
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $PathDetails.URL -join '/'
             $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
