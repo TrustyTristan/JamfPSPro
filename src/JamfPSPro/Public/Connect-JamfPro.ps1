@@ -66,7 +66,7 @@ function Connect-JamfPro {
 
     PROCESS {
         # Check for existing session
-        if ( $force -or (-not $TokenJamfPSPro.expires) ) {
+        if ( $force -or (-not $TokenJamfPSPro.expires) -or (-not $TokenJamfPSPro.token) ) {
 
             if ( $TokenJamfPSPro.Credential ) {
                 $Credential = $TokenJamfPSPro.Credential
@@ -114,14 +114,15 @@ function Connect-JamfPro {
             try {
                 Write-Information "Trying $uri_KeepAlive"
                 $KeepAlive = Invoke-RestMethod $uri_KeepAlive -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method POST
-                $TokenJamfPSPro.token = [ConvertToSS]::Set($TokenResult.Token)
+                $TokenJamfPSPro.psobject.Properties.Remove('token')
+                $TokenJamfPSPro.psobject.Properties.Add([PSNoteProperty]::new('token', [ConvertToSS]::Set($KeepAlive.Token)))
                 $TokenJamfPSPro.expires = (Get-Date $KeepAlive.expires).AddMinutes((Get-TimeZone).BaseUtcOffset.TotalMinutes)
                 Write-Information "Token expires: $($TokenJamfPSPro.expires)"
             } catch {
                 if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.Credential ) {
                     Write-Information "Trying to connect again with stored details"
-                    $TokenJamfPSPro.expires = $null
-                    $TokenJamfPSPro.token   = $null
+                    $TokenJamfPSPro.psobject.Properties.Remove('expires')
+                    $TokenJamfPSPro.psobject.Properties.Remove('token')
                     Connect-JamfPro -Server $TokenJamfPSPro.Server -Credential $TokenJamfPSPro.credential
                 } else {
                     Clear-Variable -Name TokenJamfPSPro -Force

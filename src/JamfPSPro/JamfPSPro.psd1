@@ -12,7 +12,7 @@
 RootModule = 'JamfPSPro.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.5'
+ModuleVersion = '0.0.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -33,7 +33,7 @@ Copyright = '(c) Tristan Brazier. All rights reserved.'
 Description = 'A PowerShell module for the Jamf classic api'
 
 # Minimum version of the PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '6.0.0'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
