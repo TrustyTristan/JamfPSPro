@@ -1,5 +1,5 @@
 # JamfPSPro
-[![Minimum Supported PowerShell Version](https://img.shields.io/badge/PowerShell-5.1+-purple.svg)](https://github.com/PowerShell/PowerShell) ![Cross Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey) [![License][license-badge]](LICENSE) ![Build Status Windows PowerShell Main](https://github.com/TrustyTristan/JamfPSPro/workflows/ActionsTest-Windows-Build/badge.svg?branch=master)
+[![Minimum Supported PowerShell Version](https://img.shields.io/badge/PowerShell-6+-purple.svg)](https://github.com/PowerShell/PowerShell) ![Cross Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey) [![License][license-badge]](LICENSE) ![Build Status Windows PowerShell Main](https://github.com/TrustyTristan/JamfPSPro/workflows/ActionsTest-Windows-Build/badge.svg?branch=master)
 
 [license-badge]: https://img.shields.io/github/license/TrustyTristan/JamfPSPro
 
@@ -25,6 +25,9 @@ Install-Module -Name JamfPSPro -Repository PSGallery -Scope CurrentUser
 #### Example
 
 ```powershell
+Connect-JamfPro -Server server.jamfcloud.com -Credential $PSCredential
+Get-Jamf -Component computers -Path computers
+Get-Jamf -Component computers -Path 'computers/name/{name}' -Params 'macbookpro'
 Get-Command -Module JamfPSPro
 
 ```
