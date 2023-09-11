@@ -33,13 +33,13 @@ Copyright = '(c) Tristan Brazier. All rights reserved.'
 Description = 'A PowerShell module for the Jamf classic api'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '6.0.0'
+PowerShellVersion = '6.0'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
 
 # Minimum version of the PowerShell host required by this module
-# PowerShellHostVersion = ''
+PowerShellHostVersion = '6.0'
 
 # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
 # DotNetFrameworkVersion = ''
