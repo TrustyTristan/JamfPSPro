@@ -1,10 +1,8 @@
 # JamfPSPro
 [![Minimum Supported PowerShell Version](https://img.shields.io/badge/PowerShell-6+-purple.svg)](https://github.com/PowerShell/PowerShell) ![Cross Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey) [![License][license-badge]](LICENSE)
 
-![Build Status Windows PowerShell Core](https://github.com/TrustyTristan/JamfPSPro/workflows/ActionsTest-Windows-pwsh-Build/badge.svg?branch=master)
-
-![Build Status Linux](https://github.com/TrustyTristan/JamfPSPro/workflows/ActionsTest-Linux-Build/badge.svg?branch=master)
-
+![Build Status Windows PowerShell Core](https://github.com/TrustyTristan/JamfPSPro/workflows/ActionsTest-Windows-pwsh-Build/badge.svg?branch=master) \
+![Build Status Linux](https://github.com/TrustyTristan/JamfPSPro/workflows/ActionsTest-Linux-Build/badge.svg?branch=master) \
 ![Build Status MacOS](https://github.com/TrustyTristan/JamfPSPro/workflows/ActionsTest-MacOS-Build/badge.svg?branch=master)
 
 [license-badge]: https://img.shields.io/github/license/TrustyTristan/JamfPSPro
