@@ -5,8 +5,6 @@
         Updates data from Jamf Pro
     .PARAMETER Component
         Specify the 'component' name
-    .PARAMETER Path
-        Specify the selection method of the 'component path'
     .PARAMETER Params
         Specify params outlined by '{}' in component path
     .PARAMETER Content
@@ -39,7 +37,7 @@ function Set-Jamf {
     )
     DynamicParam {
         $ValidOptions = @( Get-ValidOption -Method 'put' -Component $Component )
-        Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1
+        Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
     }
     BEGIN {
         $Path = $PSBoundParameters.Path

@@ -5,8 +5,6 @@
         Get data from Jamf Pro
     .PARAMETER Component
         Specify the 'component' name
-    .PARAMETER Path
-        Specify the selection method of the 'component path'
     .PARAMETER Params
         Specify params outlined by '{}' in component path
     .EXAMPLE
@@ -33,7 +31,7 @@ function Get-Jamf {
     )
     DynamicParam {
         $ValidOptions = @( Get-ValidOption -Method 'get' -Component $Component )
-        Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1
+        Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
     }
     BEGIN {
         if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.credential ) {
@@ -68,19 +66,21 @@ function Get-Jamf {
             } else {
                 return $Result
             }
-        } elseif ( $Params.count -ge 1 ) {
+        } elseif ( $Params.count -gt 1 ) {
             Write-Information "Multi Params"
+            $Results = New-Object System.Collections.Generic.List[System.Object]
             foreach ( $Param in $Params ) {
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
                 if ( $Result -match '^Invalid response from') {
-                    Write-Error $Result
+                    Write-Error $Results.Add($Result)
                 } else {
-                    return $Result
+                    $Results.Add($Result)
                 }
             }
+            return $Results
         } else {
             Write-Information "Single Param"
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
