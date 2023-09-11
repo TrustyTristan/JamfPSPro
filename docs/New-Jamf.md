@@ -13,7 +13,8 @@ Sets/Post data from Jamf Pro
 ## SYNTAX
 
 ```
-New-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
+New-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <Object>] [-WhatIf] [-Confirm] -Path <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -63,6 +64,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Content
+The content to send to jamf in json format
+
+```yaml
+Type: Object
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -WhatIf
 Shows what would happen if the cmdlet runs.
 The cmdlet is not run.
@@ -88,6 +104,21 @@ Parameter Sets: (All)
 Aliases: cf
 
 Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+Specify the selection method of the 'component path'
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False

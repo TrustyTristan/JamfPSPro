@@ -14,7 +14,7 @@ Updates data from Jamf Pro
 
 ```
 Set-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <String[]>] [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ -Path <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -99,6 +99,21 @@ Parameter Sets: (All)
 Aliases: cf
 
 Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+Specify the selection method of the 'component path'
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False

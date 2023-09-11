@@ -13,7 +13,7 @@ Get data from Jamf Pro
 ## SYNTAX
 
 ```
-Get-Jamf [-Component] <String> [[-Params] <String[]>] [<CommonParameters>]
+Get-Jamf [-Component] <String> [[-Params] <String[]>] -Path <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -58,6 +58,21 @@ Aliases:
 
 Required: False
 Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+Specify the selection method of the 'component path'
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

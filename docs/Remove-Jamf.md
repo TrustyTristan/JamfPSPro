@@ -13,7 +13,8 @@ Removes data from Jamf Pro
 ## SYNTAX
 
 ```
-Remove-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] -Path <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -83,6 +84,21 @@ Parameter Sets: (All)
 Aliases: cf
 
 Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Path
+Specify the selection method of the 'component path'
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
