@@ -83,8 +83,9 @@ function Get-Jamf {
             return $Results
         } else {
             Write-Information "Single Param"
+            $RestURL = $PathDetails.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $PathDetails.URL -join '/'
+            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
             $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
             if ( $Result -match '^Invalid response from') {
                 Write-Error $Result

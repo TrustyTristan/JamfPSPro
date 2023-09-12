@@ -70,8 +70,9 @@ function Remove-Jamf {
             }
             return $Results
         } else {
+            $RestURL = $PathDetails.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $PathDetails.URL -join '/'
+            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$Component",'Create')){
                 return Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
             }
