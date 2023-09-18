@@ -16,11 +16,15 @@ function Invoke-JamfAPICall {
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string]$Method
+        [string]$Method,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$AppType = 'application/json'
     )
 
     BEGIN {
-        $app_Type   = 'application/json'
+        $app_Type = $AppType
         $app_Headers = @{
             Server  = $TokenJamfPSPro.Server
             BaseURL = $BaseURL
@@ -39,12 +43,16 @@ function Invoke-JamfAPICall {
 
             # Expand result if only 1 property at top
             if ( ($Response.PSObject.Properties | Measure-Object).Count -eq 1 ) {
-                return ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
+                ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
             } else {
-                return $Response
+                $Response
             }
+            $Response | Add-Member -NotePropertyName 'IsSuccessStatusCode' -NotePropertyValue $true
+            return $Response
         } catch {
-            return "Invalid response from `'$Path`'`n$($_.Exception.Message)"
+            $ErrorMessage = $_
+            $ErrorMessage | Add-Member -NotePropertyName IsSuccessStatusCode -NotePropertyValue $false
+            return $ErrorMessage
         }
     }
 }
