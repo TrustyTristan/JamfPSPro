@@ -13,7 +13,7 @@ Get data from Jamf Pro
 ## SYNTAX
 
 ```
-Get-Jamf [-Component] <String> [[-Params] <String[]>] -Path <String> [<CommonParameters>]
+Get-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] -Path <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -58,6 +58,37 @@ Aliases:
 
 Required: False
 Position: 3
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

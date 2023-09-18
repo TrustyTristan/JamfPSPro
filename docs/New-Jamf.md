@@ -24,12 +24,7 @@ Sets/Post data from Jamf Pro
 
 ### EXAMPLE 1
 ```
-New-Jamf -Component computers -Path 'computers/{id}/recalculate-smart-groups' -Param 420
-```
-
-### EXAMPLE 2
-```
-New-Jamf -Component enrollment -Path 'enrollment/history/export'
+New-Jamf -Component computers -Path 'computers/{id}/recalculate-smart-groups' -Param 420 -Content $Data
 ```
 
 ## PARAMETERS

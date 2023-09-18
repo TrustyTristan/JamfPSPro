@@ -8,23 +8,28 @@ schema: 2.0.0
 # Set-Jamf
 
 ## SYNOPSIS
-Updates data from Jamf Pro
+Sets/Post data from Jamf Pro
 
 ## SYNTAX
 
 ```
-Set-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <String[]>] [-WhatIf] [-Confirm]
- -Path <String> [<CommonParameters>]
+Set-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <Object>] [-WhatIf] [-Confirm] -Path <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Updates data from Jamf Pro
+Sets/Post data from Jamf Pro
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Set-Jamf -Component scripts -Path 'scripts/{id}' -Params 420
+Set-Jamf -Component computers -Path 'computers/{id}/recalculate-smart-groups' -Param 420
+```
+
+### EXAMPLE 2
+```
+Set-Jamf -Component enrollment -Path 'enrollment/history/export'
 ```
 
 ## PARAMETERS
@@ -55,15 +60,15 @@ Aliases:
 Required: False
 Position: 3
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
 ### -Content
-Specify content in valid schema
+The content to send to jamf in json format
 
 ```yaml
-Type: String[]
+Type: Object
 Parameter Sets: (All)
 Aliases:
 
