@@ -14,7 +14,7 @@
 #>
 function Get-Jamf {
 
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(
             Position = 0,
@@ -25,7 +25,8 @@ function Get-Jamf {
 
         [Parameter(
             Position = 2,
-            Mandatory = $false)]
+            Mandatory = $false,
+            ValueFromPipeline = $true)]
         [ValidateScript({ ![String]::IsNullOrEmpty($_) })]
         [String[]]$Params
     )
@@ -60,11 +61,13 @@ function Get-Jamf {
             }
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
-            $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
-            if ( $Result -match '^Invalid response from') {
-                Write-Error $Result
-            } else {
-                return $Result
+            if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+                if ( $Result.IsSuccessStatusCode -eq $true ) {
+                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                } else {
+                    Write-Error (Get-ErrorMessage $Result)
+                }
             }
         } elseif ( $Params.count -gt 1 ) {
             Write-Information "Multi Params"
@@ -73,12 +76,16 @@ function Get-Jamf {
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
-                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
-                if ( $Result -match '^Invalid response from') {
-                    Write-Error $Results.Add($Result)
-                } else {
-                    $Results.Add($Result)
+
+                if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
+                    $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+                    if ( $Result.IsSuccessStatusCode -eq $true) {
+                        $Results.Add( ($Result | Select-Object * -ExcludeProperty IsSuccessStatusCode) )
+                    } else {
+                        Write-Error (Get-ErrorMessage $Result)
+                    }
                 }
+
             }
             return $Results
         } else {
@@ -86,11 +93,13 @@ function Get-Jamf {
             $RestURL = $PathDetails.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
-            $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
-            if ( $Result -match '^Invalid response from') {
-                Write-Error $Result
-            } else {
-                return $Result
+            if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
+                if ( $Result.IsSuccessStatusCode -eq $true) {
+                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                } else {
+                    Write-Error (Get-ErrorMessage $Result)
+                }
             }
         }
     }

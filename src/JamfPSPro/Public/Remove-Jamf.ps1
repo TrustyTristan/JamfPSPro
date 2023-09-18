@@ -23,7 +23,8 @@ function Remove-Jamf {
 
         [Parameter(
             Position = 2,
-            Mandatory = $false)]
+            Mandatory = $false,
+            ValueFromPipeline = $true)]
         [ValidateScript({ ![String]::IsNullOrEmpty($_) })]
         [String[]]$Params
     )
@@ -32,6 +33,12 @@ function Remove-Jamf {
         Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
     }
     BEGIN {
+        if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.credential ) {
+            Connect-JamfPro -Server $TokenJamfPSPro.Server -Credential $TokenJamfPSPro.credential
+        } else {
+            Connect-JamfPro
+        }
+
         $Path = $PSBoundParameters.Path
         $PathDetails = $ValidOptions | Where-Object {$_.url -eq $Path}
         $ReplaceMatches = $PathDetails.URL | Select-String -Pattern '{.*?}' -AllMatches
@@ -46,24 +53,29 @@ function Remove-Jamf {
             }
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
-            if ($PSCmdlet.ShouldProcess("$Component",'Create')){
-                return Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
+
+            if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
+                if ( $Result.IsSuccessStatusCode -eq $true ) {
+                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                } else {
+                    Write-Error (Get-ErrorMessage $Result)
+                }
             }
         } elseif ( $Params.count -gt 1 ) {
             Write-Information "Multi Params"
             $Results = New-Object System.Collections.Generic.List[System.Object]
             foreach ( $Param in $Params ) {
-
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
 
-                if ($PSCmdlet.ShouldProcess("$Component",'Create')){
+                if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
-                    if ( $Result -match '^Invalid response from') {
-                        Write-Error $Results.Add($Result)
+                    if ( $Result.IsSuccessStatusCode -eq $true) {
+                        $Results.Add( ($Result | Select-Object * -ExcludeProperty IsSuccessStatusCode) )
                     } else {
-                        $Results.Add($Result)
+                        Write-Error (Get-ErrorMessage $Result)
                     }
                 }
 
@@ -73,8 +85,13 @@ function Remove-Jamf {
             $RestURL = $PathDetails.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
-            if ($PSCmdlet.ShouldProcess("$Component",'Create')){
-                return Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
+            if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
+                if ( $Result.IsSuccessStatusCode -eq $true ) {
+                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                } else {
+                    Write-Error (Get-ErrorMessage $Result)
+                }
             }
         }
     }
