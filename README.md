@@ -7,15 +7,13 @@
 
 [license-badge]: https://img.shields.io/github/license/TrustyTristan/JamfPSPro
 
-## Warning 
-
-This is in a very early state, could be many issues.
-Get-Jamf should hopefully be working.
-Have done a small amount of testing with Remove-Jamf and New-Jamf
-
 ## Description
 
 JamfPSPro is a PowerShell module that aims to bring cli tools for the Jamf API, can use both Classic API and Jamf Pro API
+
+### Warning 
+
+Most things seem to be working most of the time.
 
 ## Getting Started
 
@@ -31,14 +29,48 @@ Install-Module -Name JamfPSPro -Repository PSGallery -Scope CurrentUser
 #### Example
 
 ```powershell
-Connect-JamfPro -Server server.jamfcloud.com -Credential $PSCredential
-Get-Jamf -Component computers -Path computers
-Get-Jamf -Component computers -Path 'computers/name/{name}' -Params 'macbookpro'
-Get-Command -Module JamfPSPro
+PS > Connect-JamfPro -Server server.jamfcloud.com -Credential $PSCredential
 
+Account  Access     Server               Build     Expires
+-------  ------     ------               -----     -------
+UserName FullAccess trusty.jamfcloud.com 10.69.420 19/9/2023 4:20:00 pm
 ```
+
+```powershell
+PS > Get-Jamf -Component computers -Path 'computers/name/{name}' -Params 'macbookpro'
+
+general                : @{...}
+location               : @{...}
+peripherals            : {}
+hardware               : @{...}
+certificates           : {...}
+security               : @{...}
+software               : @{...}
+extension_attributes   : {...}
+groups_accounts        : @{...}
+iphones                : {}
+configuration_profiles : {...}
+```
+
 ## JamfPSPro Cmdlets
-[Cmdlets list](/docs/JamfPSPro.md)
+### [Connect-JamfPro](Connect-JamfPro.md)
+Connects to JamfPro
+
+### [Get-Jamf](Get-Jamf.md)
+Get data from Jamf Pro
+
+### [New-Jamf](New-Jamf.md)
+Sets/Post data from Jamf Pro
+
+### [Remove-Jamf](Remove-Jamf.md)
+Removes data from Jamf Pro
+
+### [Set-Jamf](Set-Jamf.md)
+Sets/Post data from Jamf Pro
+
+## To Do
+
+ - Get schema... would ideally get the schema for post/put in PSObject format.
 
 ## Contributing
 
