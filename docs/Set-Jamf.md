@@ -65,7 +65,7 @@ Accept wildcard characters: False
 ```
 
 ### -Content
-The content to send to jamf in json format
+The content to send to jamf
 
 ```yaml
 Type: Object

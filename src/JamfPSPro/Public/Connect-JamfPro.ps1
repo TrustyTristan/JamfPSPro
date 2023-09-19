@@ -68,7 +68,10 @@ function Connect-JamfPro {
         # Check for existing session
         if ( $force -or (-not $TokenJamfPSPro.expires) -or (-not $TokenJamfPSPro.token) ) {
 
+            Write-Debug "Try to get new token"
+
             if ( $TokenJamfPSPro.Credential ) {
+                Write-Debug "Using saved credential: $($TokenJamfPSPro.Credential.UserName)"
                 $Credential = $TokenJamfPSPro.Credential
             }
             while ( $Credential -eq [System.Management.Automation.PSCredential]::Empty ) {
@@ -110,21 +113,23 @@ function Connect-JamfPro {
             $ConnectionDetails | Format-Table
 
         } elseif ( $TokenJamfPSPro.token -and ( (Get-Date $TokenJamfPSPro.expires) -le ((Get-Date).AddMinutes(20)) ) ) {
-            Write-Information "Token Variable Found"
+            Write-Debug "Found token with healthy expiry. Expires: $($TokenJamfPSPro.expires)"
             try {
-                Write-Information "Trying $uri_KeepAlive"
+                Write-Debug "Attempting to refresh token"
                 $KeepAlive = Invoke-RestMethod $uri_KeepAlive -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method POST
                 $TokenJamfPSPro.psobject.Properties.Remove('token')
                 $TokenJamfPSPro.psobject.Properties.Add([PSNoteProperty]::new('token', [ConvertToSS]::Set($KeepAlive.Token)))
                 $TokenJamfPSPro.expires = (Get-Date $KeepAlive.expires).AddMinutes((Get-TimeZone).BaseUtcOffset.TotalMinutes)
-                Write-Information "Token expires: $($TokenJamfPSPro.expires)"
+                Write-Debug "New token expires: $($TokenJamfPSPro.expires)"
             } catch {
+                Write-Debug "Error refreshing token"
                 if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.Credential ) {
-                    Write-Information "Trying to connect again with stored details"
                     $TokenJamfPSPro.psobject.Properties.Remove('expires')
                     $TokenJamfPSPro.psobject.Properties.Remove('token')
+                    Write-Debug "Cleared expiry and token"
                     Connect-JamfPro -Server $TokenJamfPSPro.Server -Credential $TokenJamfPSPro.credential
                 } else {
+                    Write-Debug "No stored credentials"
                     Clear-Variable -Name TokenJamfPSPro -Force
                     Connect-JamfPro
                 }

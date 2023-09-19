@@ -25,14 +25,15 @@ function New-Jamf {
 
         [Parameter(
             Position = 2,
-            Mandatory = $false)]
-        [ValidateScript({ ![String]::IsNullOrEmpty($_) })]
+            Mandatory = $false,
+            ValueFromPipeline = $true)]
+        [ValidateNotNullOrEmpty()]
         [String[]]$Params,
 
         [Parameter(
             Position = 3,
             Mandatory = $false)]
-        [ValidateScript({ ![String]::IsNullOrEmpty($_) })]
+        [ValidateNotNullOrEmpty()]
         $Content
     )
     DynamicParam {
@@ -53,7 +54,36 @@ function New-Jamf {
     }
 
     PROCESS {
+
+        # Convert content to Simple XML
+        if ( $Content.GetType() -eq 'XmlDocument' ) {
+            Write-Debug "Content type: XML"
+            $Content = $Content.InnerXml
+        } elseif ( $Content.GetType() -eq 'PSCustomObject' ) {
+            Write-Debug "Content type: PSObject"
+            $Content = ( ConvertTo-SimpleXml $Content )
+        } elseif ( $Content.GetType() -eq 'String' ) {
+            Write-Debug "Content type: String"
+            try {
+                $Content = ( [xml]$Content ).InnerXml
+                Write-Debug "Content in XML format"
+            } catch {
+                try {
+                    $Content = ConvertFrom-Json -InputObject $Content
+                    Write-Debug "Content in Json format"
+                } catch {
+                    Write-Debug "Could not format content"
+                    break
+                }
+            }
+        }
+
         if ( $ReplaceMatches.count -gt 1 ) {
+
+            Write-Debug "Multi param path"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             foreach ( $replace in $ReplaceMatches.Matches.value ) {
                 $RestURL = $PathDetails.URL -replace $replace, $Params[$replacementCounter]
                 $replacementCounter++
@@ -61,15 +91,24 @@ function New-Jamf {
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$Component",'Create')){
-                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content -AppType 'application/xml'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {
-                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                    return [pscustomobject]@{
+                        Action  = 'Created'
+                        Path    = $RestURL
+                        Content = $Content
+                        Result  = $Result
+                    }
                 } else {
                     Write-Error (Get-ErrorMessage $Result)
                 }
             }
         } elseif ( $Params.count -gt 1 ) {
-            Write-Information "Multi Params"
+
+            Write-Debug "Multi params"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             $Results = New-Object System.Collections.Generic.List[System.Object]
             foreach ( $Param in $Params ) {
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
@@ -77,9 +116,16 @@ function New-Jamf {
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
 
                 if ($PSCmdlet.ShouldProcess("$Component",'Create')){
-                    $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content
+                    $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content -AppType 'application/xml'
                     if ( $Result.IsSuccessStatusCode -eq $true) {
-                        $Results.Add( ($Result | Select-Object * -ExcludeProperty IsSuccessStatusCode) )
+                        $Results.Add(
+                            [pscustomobject]@{
+                                Action  = 'Created'
+                                Path    = $RestURL
+                                Content = $Content
+                                Result  = $Result
+                            }
+                        )
                     } else {
                         Write-Error (Get-ErrorMessage $Result)
                     }
@@ -88,13 +134,23 @@ function New-Jamf {
             }
             return $Results
         } else {
+
+            Write-Debug "Single param"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             $RestURL = $PathDetails.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$Component",'Create')){
-                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content -AppType 'application/xml'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {
-                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                    return [pscustomobject]@{
+                        Action  = 'Created'
+                        Path    = $RestURL
+                        Content = $Content
+                        Result  = $Result
+                    }
                 } else {
                     Write-Error (Get-ErrorMessage $Result)
                 }

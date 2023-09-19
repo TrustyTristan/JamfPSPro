@@ -27,7 +27,7 @@ function Get-Jamf {
             Position = 2,
             Mandatory = $false,
             ValueFromPipeline = $true)]
-        [ValidateScript({ ![String]::IsNullOrEmpty($_) })]
+        [ValidateNotNullOrEmpty()]
         [String[]]$Params
     )
     DynamicParam {
@@ -49,7 +49,11 @@ function Get-Jamf {
 
     PROCESS {
         if ( $ReplaceMatches.Matches.count -gt 1 ) {
-            Write-Information "Multi Param Path"
+
+            Write-Debug "Multi param path"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             foreach ( $replace in $ReplaceMatches.Matches.value ) {
                 if ( $ReplacementCounter -eq 0 ) {
                     $RestURL = $PathDetails.URL -replace $replace, $Params[$ReplacementCounter]
@@ -70,7 +74,11 @@ function Get-Jamf {
                 }
             }
         } elseif ( $Params.count -gt 1 ) {
-            Write-Information "Multi Params"
+
+            Write-Debug "Multi params"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             $Results = New-Object System.Collections.Generic.List[System.Object]
             foreach ( $Param in $Params ) {
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
@@ -89,7 +97,11 @@ function Get-Jamf {
             }
             return $Results
         } else {
-            Write-Information "Single Param"
+
+            Write-Debug "Single param"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             $RestURL = $PathDetails.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'

@@ -34,24 +34,34 @@ function Invoke-JamfAPICall {
 
     PROCESS {
         try {
-            Write-Information "Uri: $Path"
+
+            Write-Debug "Uri: $Path"
+            Write-Debug "AppType: $app_Type"
+
             if ( $Body ) {
                 $Response = Invoke-RestMethod $Path -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method $Method -Body $Body -ErrorAction Stop
             } else {
                 $Response = Invoke-RestMethod $Path -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method $Method -ErrorAction Stop
             }
 
-            # Expand result if only 1 property at top
+            # Expand result if only 1 property at top level
             if ( ($Response.PSObject.Properties | Measure-Object).Count -eq 1 ) {
-                ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
-            } else {
-                $Response
+                $Response = ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
             }
-            $Response | Add-Member -NotePropertyName 'IsSuccessStatusCode' -NotePropertyValue $true
+
+            # No response with delete, don't know of a way to validate success
+            if ( $Method -eq 'delete' ) {
+                $Response = [PSCustomObject]@{
+                    IsSuccessStatusCode = $true
+                }
+            } else {
+                Add-Member -InputObject $Response -NotePropertyName 'IsSuccessStatusCode' -NotePropertyValue $true
+            }
+
             return $Response
         } catch {
             $ErrorMessage = $_
-            $ErrorMessage | Add-Member -NotePropertyName IsSuccessStatusCode -NotePropertyValue $false
+            Add-Member -InputObject $ErrorMessage -NotePropertyName IsSuccessStatusCode -NotePropertyValue $false
             return $ErrorMessage
         }
     }

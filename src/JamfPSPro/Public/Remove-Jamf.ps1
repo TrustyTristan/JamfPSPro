@@ -25,7 +25,7 @@ function Remove-Jamf {
             Position = 2,
             Mandatory = $false,
             ValueFromPipeline = $true)]
-        [ValidateScript({ ![String]::IsNullOrEmpty($_) })]
+        [ValidateNotNullOrEmpty()]
         [String[]]$Params
     )
     DynamicParam {
@@ -47,6 +47,11 @@ function Remove-Jamf {
 
     PROCESS {
         if ( $ReplaceMatches.count -gt 1 ) {
+
+            Write-Debug "Multi param path"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             foreach ( $replace in $ReplaceMatches.Matches.value ) {
                 $RestURL = $PathDetails.URL -replace $replace, $Params[$replacementCounter]
                 $replacementCounter++
@@ -57,13 +62,20 @@ function Remove-Jamf {
             if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {
-                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                    return [pscustomobject]@{
+                        Action = 'Removed'
+                        Path   = $RestURL
+                    }
                 } else {
                     Write-Error (Get-ErrorMessage $Result)
                 }
             }
         } elseif ( $Params.count -gt 1 ) {
-            Write-Information "Multi Params"
+
+            Write-Debug "Multi params"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             $Results = New-Object System.Collections.Generic.List[System.Object]
             foreach ( $Param in $Params ) {
                 $RestURL = $PathDetails.URL -replace '{.*?}', $Param
@@ -73,7 +85,12 @@ function Remove-Jamf {
                 if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
                     if ( $Result.IsSuccessStatusCode -eq $true) {
-                        $Results.Add( ($Result | Select-Object * -ExcludeProperty IsSuccessStatusCode) )
+                        $Results.Add(
+                            [pscustomobject]@{
+                                Action = 'Removed'
+                                Path   = $RestURL
+                            }
+                        )
                     } else {
                         Write-Error (Get-ErrorMessage $Result)
                     }
@@ -82,14 +99,23 @@ function Remove-Jamf {
             }
             return $Results
         } else {
+
+            Write-Debug "Single param"
+            Write-Debug "Path: $Path"
+            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
+
             $RestURL = $PathDetails.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {
-                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
+                    return [pscustomobject]@{
+                        Action = 'Removed'
+                        Path   = $RestURL
+                    }
                 } else {
+                    Write-Debug "IsSuccessStatusCode: $false"
                     Write-Error (Get-ErrorMessage $Result)
                 }
             }
