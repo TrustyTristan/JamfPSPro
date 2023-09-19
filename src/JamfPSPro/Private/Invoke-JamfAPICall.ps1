@@ -44,6 +44,9 @@ function Invoke-JamfAPICall {
                 $Response = Invoke-RestMethod $Path -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method $Method -ErrorAction Stop
             }
 
+            # totalCount is unnecessary
+            $Response.PSObject.Properties.Remove('totalCount')
+
             # Expand result if only 1 property at top level
             if ( ($Response.PSObject.Properties | Measure-Object).Count -eq 1 ) {
                 $Response = ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
@@ -55,7 +58,7 @@ function Invoke-JamfAPICall {
                     IsSuccessStatusCode = $true
                 }
             } else {
-                Add-Member -InputObject $Response -NotePropertyName 'IsSuccessStatusCode' -NotePropertyValue $true
+                $Response | Add-Member -NotePropertyName 'IsSuccessStatusCode' -NotePropertyValue $true
             }
 
             return $Response
