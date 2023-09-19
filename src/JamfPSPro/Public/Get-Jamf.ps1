@@ -87,7 +87,7 @@ function Get-Jamf {
 
                 if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
-                    if ( $Result.IsSuccessStatusCode -eq $true) {
+                    if ( $Result.IsSuccessStatusCode -eq $true ) {
                         $Results.Add( ($Result | Select-Object * -ExcludeProperty IsSuccessStatusCode) )
                     } else {
                         Write-Error (Get-ErrorMessage $Result)
@@ -107,7 +107,7 @@ function Get-Jamf {
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
-                if ( $Result.IsSuccessStatusCode -eq $true) {
+                if ( $Result.IsSuccessStatusCode -eq $true ) {
                     return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
                 } else {
                     Write-Error (Get-ErrorMessage $Result)
