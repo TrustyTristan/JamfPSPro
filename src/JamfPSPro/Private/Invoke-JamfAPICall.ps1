@@ -49,7 +49,11 @@ function Invoke-JamfAPICall {
 
             # Expand result if only 1 property at top level
             if ( ($Response.PSObject.Properties | Measure-Object).Count -eq 1 ) {
-                $Response = ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value 
+                $Response = ($Response | Where-Object {$_.getType().Name -eq 'PSCustomObject'}).PSObject.Properties.Value
+                # If response is empty, but still valid
+                if ( -not $Response ) {
+                    $Response = [PSCustomObject]@{}
+                }
             }
 
             # No response with delete, don't know of a way to validate success
