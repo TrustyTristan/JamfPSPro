@@ -11,7 +11,6 @@ function Invoke-JamfAPICall {
         [string]$BaseURL,
 
         [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
         $Body,
 
         [Parameter(Mandatory = $true)]
