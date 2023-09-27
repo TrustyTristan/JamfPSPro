@@ -8,29 +8,37 @@ schema: 2.0.0
 # New-Jamf
 
 ## SYNOPSIS
-Sets/Post data from Jamf Pro
+Create a new resource or record in Jamf Pro.
 
 ## SYNTAX
 
 ```
-New-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <Object>] [-WhatIf] [-Confirm] -Path <String>
- [<CommonParameters>]
+New-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <Object>] [-WhatIf] [-Confirm]
+ -Select <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Sets/Post data from Jamf Pro
+The New-Jamf cmdlet allows you to create a new resource or record in a Jamf Pro
+system, which is a comprehensive management solution for macOS and iOS devices.
+You can use this cmdlet to add new assets, configurations, or other entities to
+your Jamf Pro environment.
+Ensure that you have the necessary permissions and
+access to perform this action.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-Jamf -Component computers -Path 'computers/{id}/recalculate-smart-groups' -Param 420 -Content $Data
+New-Jamf -Component computers -Select 'ID/recalculate-smart-groups' -Param 420
+Recalculates the smart group for the given computer id and then returns the count of
+smart groups the computer falls into.
 ```
 
 ## PARAMETERS
 
 ### -Component
-Specify the 'component' name
+Specifies the component or resource name in Jamf Pro from which to create data.
+This parameter is mandatory.
 
 ```yaml
 Type: String
@@ -45,7 +53,9 @@ Accept wildcard characters: False
 ```
 
 ### -Params
-Specify params outlined by '{}' in component path
+Specifies additional parameters required for filtering or customizing the data
+retrieval.
+Parameters are indicated by UPPERCASE from -Select
 
 ```yaml
 Type: String[]
@@ -60,7 +70,7 @@ Accept wildcard characters: False
 ```
 
 ### -Content
-The content to send to jamf in json format
+The content to send to jamf this can be in json, PSObject or jamf simple xml format.
 
 ```yaml
 Type: Object
@@ -105,7 +115,7 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Path
+### -Select
 Specify the selection method of the 'component path'
 
 ```yaml

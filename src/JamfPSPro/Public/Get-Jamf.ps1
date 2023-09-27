@@ -1,16 +1,33 @@
 <#
     .SYNOPSIS
-        Get data from Jamf Pro
+        Retrieve data from Jamf Pro.
     .DESCRIPTION
-        Get data from Jamf Pro
+        The Get-Jamf cmdlet allows you to retrieve data from Jamf Pro, a comprehensive
+        management solution for macOS and iOS devices. This cmdlet provides various
+        options for fetching specific information from Jamf Pro based on your requirements.
+        You can specify the component, select fields, and provide additional parameters to
+        customize your data retrieval.
+
+        Note: Ensure that you have proper permissions and access to Jamf Pro.
     .PARAMETER Component
-        Specify the 'component' name
+        Specifies the component or resource name in Jamf Pro from which to retrieve data.
+        This parameter is mandatory.
+    .PARAMETER Select
+        Specifies the fields to use to retrieved data. The UPPERCASE values are to indicate
+        the parameters for -Param. The 'all' selection is available to some components to
+        retrieve all available fields, no -Param option is required in this case.
+        This parameter is mandatory.
     .PARAMETER Params
-        Specify params outlined by '{}' in component path
+        Specifies additional parameters required for filtering or customizing the data
+        retrieval. Parameters are indicated by UPPERCASE from -Select
     .EXAMPLE
-        Get-Jamf -Component computers -Path 'computers/name/{name}' -Param 'HostName'
+        Get-Jamf -Component computers -Select all
+        Retrieves all available information for computers in Jamf Pro.
     .EXAMPLE
-        Get-Jamf -Component local-admin-password -Path 'local-admin-password/{clientManagementId}/account/{username}/audit' -Param 69,myUser
+        Get-Jamf -Component computers -Select NAME -Param 'MacBookPro69'
+        Retrieves the computer object details for the computer names 'MacBookPro69'
+    .EXAMPLE
+        Get-Jamf -Component local-admin-password -Select 'CLIENTMANAGEMENTID/account/USERNAME/audit' -Param 69, 'myUser'
 #>
 function Get-Jamf {
 
@@ -32,7 +49,7 @@ function Get-Jamf {
     )
     DynamicParam {
         $ValidOptions = @( Get-ValidOption -Method 'get' -Component $Component )
-        Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
+        Get-DynamicParam -Name Select -ValidateSet $ValidOptions.Option -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
     }
     BEGIN {
         if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.credential ) {
@@ -41,9 +58,8 @@ function Get-Jamf {
             Connect-JamfPro
         }
 
-        $Path = $PSBoundParameters.Path
-        $PathDetails = $ValidOptions | Where-Object {$_.url -eq $Path}
-        $ReplaceMatches = $PathDetails.URL | Select-String -Pattern '{.*?}' -AllMatches
+        $Path = $ValidOptions | Where-Object {$_.Option -eq $PSBoundParameters.Select}
+        $ReplaceMatches = $Path.URL | Select-String -Pattern '{.*?}' -AllMatches
         $ReplacementCounter = 0
     }
 
@@ -51,20 +67,20 @@ function Get-Jamf {
         if ( $ReplaceMatches.Matches.count -gt 1 ) {
 
             Write-Debug "Multi param path"
-            Write-Debug "Path: $Path"
+            Write-Debug "Path: $($Path.URL)"
             Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
 
             foreach ( $replace in $ReplaceMatches.Matches.value ) {
                 if ( $ReplacementCounter -eq 0 ) {
-                    $RestURL = $PathDetails.URL -replace $replace, $Params[$ReplacementCounter]
+                    $RestURL = $Path.URL -replace $replace, $Params[$ReplacementCounter]
                     $ReplacementCounter++
                 } else {
                     $RestURL = $RestURL -replace $replace, $Params[$ReplacementCounter]
                     $ReplacementCounter++
                 }
             }
-            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
+            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
+            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {
@@ -76,14 +92,14 @@ function Get-Jamf {
         } elseif ( $Params.count -gt 1 ) {
 
             Write-Debug "Multi params"
-            Write-Debug "Path: $Path"
+            Write-Debug "Path: $($Path.URL)"
             Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
 
             $Results = New-Object System.Collections.Generic.List[System.Object]
             foreach ( $Param in $Params ) {
-                $RestURL = $PathDetails.URL -replace '{.*?}', $Param
-                $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-                $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
+                $RestURL = $Path.URL -replace '{.*?}', $Param
+                $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
+                $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
 
                 if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
@@ -99,12 +115,12 @@ function Get-Jamf {
         } else {
 
             Write-Debug "Single param"
-            Write-Debug "Path: $Path"
+            Write-Debug "Path: $($Path.URL)"
             Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
 
-            $RestURL = $PathDetails.URL -replace '{.*?}', $Params
-            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
+            $RestURL = $Path.URL -replace '{.*?}', $Params
+            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
+            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {

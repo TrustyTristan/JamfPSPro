@@ -8,34 +8,50 @@ schema: 2.0.0
 # Set-Jamf
 
 ## SYNOPSIS
-Sets/Post data from Jamf Pro
+Update or modify an existing resource or record in Jamf Pro.
 
 ## SYNTAX
 
 ```
-Set-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <Object>] [-WhatIf] [-Confirm] -Path <String>
- [<CommonParameters>]
+Set-Jamf [-Component] <String> [[-Params] <String[]>] [[-Content] <Object>] [-WhatIf] [-Confirm]
+ -Select <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Sets/Post data from Jamf Pro
+The Set-Jamf cmdlet enables you to update or modify an existing resource or
+record in a Jamf Pro system.
+Jamf Pro is a comprehensive management solution
+for macOS and iOS devices.
+You can use this cmdlet to make changes to assets,
+configurations, or other entities in your Jamf Pro environment.
+Ensure that you
+have the necessary permissions and access for this operation.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Set-Jamf -Component computers -Path 'computers/{id}/recalculate-smart-groups' -Param 420
+<name>Blazing Script</name></script>"
+Set-Jamf -Component scripts -Select ID -Param 420 -Content $UpdatedScript
+Changes the name of the script with the ID 420
 ```
 
 ### EXAMPLE 2
 ```
-Set-Jamf -Component enrollment -Path 'enrollment/history/export'
+$Update = [PSCustomObject]@{
+    'computer_group' = @{
+        'name' = 'The Plastics';
+        }
+    }
+Set-Jamf -Component computergroups -Select ID -Param 69 -Content $Update
+Changes the name of the computer group with the ID of 69
 ```
 
 ## PARAMETERS
 
 ### -Component
-Specify the 'component' name
+Specifies the component or resource name in Jamf Pro from which to update data.
+This parameter is mandatory.
 
 ```yaml
 Type: String
@@ -50,7 +66,9 @@ Accept wildcard characters: False
 ```
 
 ### -Params
-Specify params outlined by '{}' in component path
+Specifies additional parameters required for filtering or customizing the data
+retrieval.
+Parameters are indicated by UPPERCASE from -Select
 
 ```yaml
 Type: String[]
@@ -65,7 +83,7 @@ Accept wildcard characters: False
 ```
 
 ### -Content
-The content to send to jamf
+The content to send to jamf this can be in json, PSObject or jamf simple xml format.
 
 ```yaml
 Type: Object
@@ -110,7 +128,7 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Path
+### -Select
 Specify the selection method of the 'component path'
 
 ```yaml

@@ -2,7 +2,7 @@
 Module Name: JamfPSPro
 Module Guid: 9133a5ba-2ce3-4ee0-b114-c97577149383
 Download Help Link: NA
-Help Version: 0.0.9
+Help Version: 0.0.10
 Locale: en-US
 ---
 
@@ -15,15 +15,15 @@ A PowerShell module for the Jamf classic api
 Connects to JamfPro
 
 ### [Get-Jamf](Get-Jamf.md)
-Get data from Jamf Pro
+Retrieve data from Jamf Pro.
 
 ### [New-Jamf](New-Jamf.md)
-Sets/Post data from Jamf Pro
+Create a new resource or record in Jamf Pro.
 
 ### [Remove-Jamf](Remove-Jamf.md)
-Removes data from Jamf Pro
+Remove an existing resource or record from Jamf Pro.
 
 ### [Set-Jamf](Set-Jamf.md)
-Sets/Post data from Jamf Pro
+Update or modify an existing resource or record in Jamf Pro.
 
 

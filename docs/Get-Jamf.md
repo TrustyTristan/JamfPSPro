@@ -8,33 +8,49 @@ schema: 2.0.0
 # Get-Jamf
 
 ## SYNOPSIS
-Get data from Jamf Pro
+Retrieve data from Jamf Pro.
 
 ## SYNTAX
 
 ```
-Get-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] -Path <String> [<CommonParameters>]
+Get-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] -Select <String>
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Get data from Jamf Pro
+The Get-Jamf cmdlet allows you to retrieve data from Jamf Pro, a comprehensive
+management solution for macOS and iOS devices.
+This cmdlet provides various
+options for fetching specific information from Jamf Pro based on your requirements.
+You can specify the component, select fields, and provide additional parameters to
+customize your data retrieval.
+
+Note: Ensure that you have proper permissions and access to Jamf Pro.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get-Jamf -Component computers -Path 'computers/name/{name}' -Param 'HostName'
+Get-Jamf -Component computers -Select all
+Retrieves all available information for computers in Jamf Pro.
 ```
 
 ### EXAMPLE 2
 ```
-Get-Jamf -Component local-admin-password -Path 'local-admin-password/{clientManagementId}/account/{username}/audit' -Param 69,myUser
+Get-Jamf -Component computers -Select NAME -Param 'MacBookPro69'
+Retrieves the computer object details for the computer names 'MacBookPro69'
+```
+
+### EXAMPLE 3
+```
+Get-Jamf -Component local-admin-password -Select 'CLIENTMANAGEMENTID/account/USERNAME/audit' -Param 69, 'myUser'
 ```
 
 ## PARAMETERS
 
 ### -Component
-Specify the 'component' name
+Specifies the component or resource name in Jamf Pro from which to retrieve data.
+This parameter is mandatory.
 
 ```yaml
 Type: String
@@ -49,7 +65,9 @@ Accept wildcard characters: False
 ```
 
 ### -Params
-Specify params outlined by '{}' in component path
+Specifies additional parameters required for filtering or customizing the data
+retrieval.
+Parameters are indicated by UPPERCASE from -Select
 
 ```yaml
 Type: String[]
@@ -94,7 +112,7 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Path
+### -Select
 Specify the selection method of the 'component path'
 
 ```yaml

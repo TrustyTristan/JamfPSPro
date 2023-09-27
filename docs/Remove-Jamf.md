@@ -8,17 +8,23 @@ schema: 2.0.0
 # Remove-Jamf
 
 ## SYNOPSIS
-Removes data from Jamf Pro
+Remove an existing resource or record from Jamf Pro.
 
 ## SYNTAX
 
 ```
-Remove-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] -Path <String>
+Remove-Jamf [-Component] <String> [[-Params] <String[]>] [-WhatIf] [-Confirm] -Select <String>
  [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Removes data from Jamf Pro
+The Remove-Jamf cmdlet allows you to delete or remove an existing resource
+or record from a Jamf Pro system, which is a comprehensive management solution
+for macOS and iOS devices.
+You can use this cmdlet to delete assets, configurations,
+or other entities from your Jamf Pro environment.
+Ensure that you have the necessary
+permissions and access for this operation.
 
 ## EXAMPLES
 
@@ -30,7 +36,8 @@ Remove-Jamf -Component computers -Path 'computers-inventory/{id}' -Params 69
 ## PARAMETERS
 
 ### -Component
-Specify the 'component' name
+Specifies the component or resource name in Jamf Pro from which to remove data.
+This parameter is mandatory.
 
 ```yaml
 Type: String
@@ -45,7 +52,8 @@ Accept wildcard characters: False
 ```
 
 ### -Params
-Specify params outlined by '{}' in component path
+Specifies additional parameters required for filtering or selecting the data to remove.
+Parameters are indicated by UPPERCASE from -Select
 
 ```yaml
 Type: String[]
@@ -90,7 +98,7 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Path
+### -Select
 Specify the selection method of the 'component path'
 
 ```yaml

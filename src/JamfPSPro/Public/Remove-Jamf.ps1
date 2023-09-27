@@ -1,12 +1,22 @@
 <#
     .SYNOPSIS
-        Removes data from Jamf Pro
+        Remove an existing resource or record from Jamf Pro.
     .DESCRIPTION
-        Removes data from Jamf Pro
+        The Remove-Jamf cmdlet allows you to delete or remove an existing resource
+        or record from a Jamf Pro system, which is a comprehensive management solution
+        for macOS and iOS devices. You can use this cmdlet to delete assets, configurations,
+        or other entities from your Jamf Pro environment. Ensure that you have the necessary
+        permissions and access for this operation.
     .PARAMETER Component
-        Specify the 'component' name
+        Specifies the component or resource name in Jamf Pro from which to remove data.
+        This parameter is mandatory.
+    .PARAMETER Select
+        Specifies the fields to use to submit data to. The UPPERCASE values are to indicate
+        the parameters for -Param.
+        This parameter is mandatory.
     .PARAMETER Params
-        Specify params outlined by '{}' in component path
+        Specifies additional parameters required for filtering or selecting the data to remove.
+        Parameters are indicated by UPPERCASE from -Select
     .EXAMPLE
         Remove-Jamf -Component computers -Path 'computers-inventory/{id}' -Params 69
 #>
@@ -30,7 +40,7 @@ function Remove-Jamf {
     )
     DynamicParam {
         $ValidOptions = @( Get-ValidOption -Method 'delete' -Component $Component )
-        Get-DynamicParam -Name Path -ValidateSet $ValidOptions.URL -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
+        Get-DynamicParam -Name Select -ValidateSet $ValidOptions.Option -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
     }
     BEGIN {
         if ( $TokenJamfPSPro.Server -and $TokenJamfPSPro.credential ) {
@@ -39,9 +49,8 @@ function Remove-Jamf {
             Connect-JamfPro
         }
 
-        $Path = $PSBoundParameters.Path
-        $PathDetails = $ValidOptions | Where-Object {$_.url -eq $Path}
-        $ReplaceMatches = $PathDetails.URL | Select-String -Pattern '{.*?}' -AllMatches
+        $Path = $ValidOptions | Where-Object {$_.Option -eq $PSBoundParameters.Select}
+        $ReplaceMatches = $Path.URL | Select-String -Pattern '{.*?}' -AllMatches
         $replacementCounter = 0
     }
 
@@ -49,15 +58,15 @@ function Remove-Jamf {
         if ( $ReplaceMatches.count -gt 1 ) {
 
             Write-Debug "Multi param path"
-            Write-Debug "Path: $Path"
+            Write-Debug "Path: $($Path.URL)"
             Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
 
             foreach ( $replace in $ReplaceMatches.Matches.value ) {
-                $RestURL = $PathDetails.URL -replace $replace, $Params[$replacementCounter]
+                $RestURL = $Path.URL -replace $replace, $Params[$replacementCounter]
                 $replacementCounter++
             }
-            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
+            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
+            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
 
             if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
@@ -73,14 +82,14 @@ function Remove-Jamf {
         } elseif ( $Params.count -gt 1 ) {
 
             Write-Debug "Multi params"
-            Write-Debug "Path: $Path"
+            Write-Debug "Path: $($Path.URL)"
             Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
 
             $Results = New-Object System.Collections.Generic.List[System.Object]
             foreach ( $Param in $Params ) {
-                $RestURL = $PathDetails.URL -replace '{.*?}', $Param
-                $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-                $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
+                $RestURL = $Path.URL -replace '{.*?}', $Param
+                $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
+                $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
 
                 if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
@@ -101,12 +110,12 @@ function Remove-Jamf {
         } else {
 
             Write-Debug "Single param"
-            Write-Debug "Path: $Path"
+            Write-Debug "Path: $($Path.URL)"
             Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
 
-            $RestURL = $PathDetails.URL -replace '{.*?}', $Params
-            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $PathDetails.API, $RestURL -join '/'
+            $RestURL = $Path.URL -replace '{.*?}', $Params
+            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
+            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {
