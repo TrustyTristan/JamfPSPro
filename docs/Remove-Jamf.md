@@ -30,7 +30,8 @@ permissions and access for this operation.
 
 ### EXAMPLE 1
 ```
-Remove-Jamf -Component computers -Path 'computers-inventory/{id}' -Params 69
+Remove-Jamf -Component computers -Select ID -Params 69
+Removes the computer with the ID 69
 ```
 
 ## PARAMETERS

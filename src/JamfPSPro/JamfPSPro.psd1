@@ -30,7 +30,7 @@ CompanyName = 'TrustyEnterprises'
 Copyright = '(c) Tristan Brazier. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'A PowerShell module for the Jamf classic api'
+Description = 'A PowerShell module for the Jamf Classic API and Jamf Pro API'
 
 # Minimum version of the PowerShell engine required by this module
 PowerShellVersion = '6.0'

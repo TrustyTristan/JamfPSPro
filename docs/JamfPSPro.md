@@ -2,13 +2,13 @@
 Module Name: JamfPSPro
 Module Guid: 9133a5ba-2ce3-4ee0-b114-c97577149383
 Download Help Link: NA
-Help Version: 0.0.10
+Help Version: 1.0.0
 Locale: en-US
 ---
 
 # JamfPSPro Module
 ## Description
-A PowerShell module for the Jamf classic api
+A PowerShell module for the Jamf Classic API and Jamf Pro API
 
 ## JamfPSPro Cmdlets
 ### [Connect-JamfPro](Connect-JamfPro.md)

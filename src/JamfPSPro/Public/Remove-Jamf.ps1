@@ -18,7 +18,8 @@
         Specifies additional parameters required for filtering or selecting the data to remove.
         Parameters are indicated by UPPERCASE from -Select
     .EXAMPLE
-        Remove-Jamf -Component computers -Path 'computers-inventory/{id}' -Params 69
+        Remove-Jamf -Component computers -Select ID -Params 69
+        Removes the computer with the ID 69
 #>
 function Remove-Jamf {
 

@@ -9,7 +9,7 @@
 
 ## Description
 
-JamfPSPro is a PowerShell module that aims to bring cli tools for the Jamf API, can use both Classic API and Jamf Pro API
+JamfPSPro is a PowerShell module that aims to bring cli tools for the Jamf API, can use both Classic API and Jamf Pro API.
 
 ### Warning 
 
@@ -37,7 +37,7 @@ UserName FullAccess trusty.jamfcloud.com 10.69.420 19/9/2023 4:20:00 pm
 ```
 
 ```powershell
-PS > Get-Jamf -Component computers -Path 'computers/name/{name}' -Params 'macbookpro'
+PS > Get-Jamf -Component computers -Select NAME -Params 'macbookpro'
 
 general                : @{...}
 location               : @{...}
@@ -57,16 +57,74 @@ configuration_profiles : {...}
 Connects to JamfPro
 
 ### [Get-Jamf](Get-Jamf.md)
-Get data from Jamf Pro
+Retrieve data from Jamf Pro.
+
+#### EXAMPLE
+```
+Get-Jamf -Component computers -Select all
+Retrieves all available information for computers in Jamf Pro.
+```
 
 ### [New-Jamf](New-Jamf.md)
-Sets/Post data from Jamf Pro
+Create a new resource or record in Jamf Pro.
+
+#### EXAMPLE 1
+```
+New-Jamf -Component computers -Select 'ID/recalculate-smart-groups' -Param 420
+Recalculates the smart group for the given computer id and then returns the count of
+smart groups the computer falls into.
+```
+
+#### EXAMPLE 2
+```
+$NewScript = [PSCustomObject]@{
+    'script' = @{
+        'name' = 'Supa script';
+        'category' = 'Testing';
+        'info' = 'Script information';
+        'notes' = 'Created 20230420';
+        'priority' = 'Before';
+        'parameters' = @{
+                'parameter4' = 'Some input';
+            }
+        'os_requirements' = '10.15';
+        'script_contents' = '#!/bin/
+            echo "Are you there?'
+        }
+    }
+New-Jamf -Component scripts -Select ID -Params 999 -Content $NewScript
+Creates a script 'Supa script', an ID must be supplied but will use next ID.
+```
 
 ### [Remove-Jamf](Remove-Jamf.md)
-Removes data from Jamf Pro
+Remove an existing resource or record from Jamf Pro.
+
+#### EXAMPLE
+```
+Remove-Jamf -Component computers -Select ID -Params 69
+Removes the computer with the ID 69
+```
 
 ### [Set-Jamf](Set-Jamf.md)
-Sets/Post data from Jamf Pro
+Update or modify an existing resource or record in Jamf Pro.
+
+#### EXAMPLE 1
+```
+<name>Blazing Script</name></script>"
+Set-Jamf -Component scripts -Select ID -Param 420 -Content $UpdatedScript
+Changes the name of the script with the ID 420
+```
+
+#### EXAMPLE 2
+```
+$Update = [PSCustomObject]@{
+    'computer_group' = @{
+        'name' = 'The Plastics';
+        }
+    }
+Set-Jamf -Component computergroups -Select ID -Param 69 -Content $Update
+Changes the name of the computer group with the ID of 69
+```
 
 ## To Do
 

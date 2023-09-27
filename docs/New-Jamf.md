@@ -34,6 +34,27 @@ Recalculates the smart group for the given computer id and then returns the coun
 smart groups the computer falls into.
 ```
 
+### EXAMPLE 2
+```
+$NewScript = [PSCustomObject]@{
+    'script' = @{
+        'name' = 'Supa script';
+        'category' = 'Testing';
+        'info' = 'Script information';
+        'notes' = 'Created 20230420';
+        'priority' = 'Before';
+        'parameters' = @{
+                'parameter4' = 'Some input';
+            }
+        'os_requirements' = '10.15';
+        'script_contents' = '#!/bin/
+            echo "Are you there?'
+        }
+    }
+New-Jamf -Component scripts -Select ID -Params 999 -Content $NewScript
+Creates a script 'Supa script', an ID must be supplied but will use next ID.
+```
+
 ## PARAMETERS
 
 ### -Component
