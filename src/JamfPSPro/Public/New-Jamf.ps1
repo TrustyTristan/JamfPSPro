@@ -86,13 +86,13 @@ function New-Jamf {
 
         if ( $Content ) {
             # Convert content to Simple XML
-            if ( $Content.GetType() -eq 'XmlDocument' ) {
+            if ( $Content.GetType().Name -eq 'XmlDocument' ) {
                 Write-Debug "Content type: XML"
                 $Content = $Content.InnerXml
-            } elseif ( $Content.GetType() -eq 'PSCustomObject' ) {
+            } elseif ( $Content.GetType().Name -eq 'PSCustomObject' ) {
                 Write-Debug "Content type: PSObject"
                 $Content = ( ConvertTo-SimpleXml $Content )
-            } elseif ( $Content.GetType() -eq 'String' ) {
+            } elseif ( $Content.GetType().Name -eq 'String' ) {
                 Write-Debug "Content type: String"
                 try {
                     $Content = ( [xml]$Content ).InnerXml
