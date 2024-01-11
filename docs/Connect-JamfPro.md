@@ -13,7 +13,7 @@ Connects to JamfPro
 ## SYNTAX
 
 ```
-Connect-JamfPro [-Server] <String> [[-Credential] <PSCredential>] [-Force] [<CommonParameters>]
+Connect-JamfPro [-Server] <String> [[-Credential] <PSCredential>] [-Force] [-NoWelcome] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -65,6 +65,21 @@ Accept wildcard characters: False
 
 ### -Force
 Force reconnection to API ignoring 'valid' token
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NoWelcome
+Prevents the connection information being displayed
 
 ```yaml
 Type: SwitchParameter
