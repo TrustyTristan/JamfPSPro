@@ -219,11 +219,11 @@
                         "explode": true,
                         "schema": {
                             "type": "string",
+                            "default": "ASC",
                             "enum": [
                                 "ASC",
                                 "DESC"
-                            ],
-                            "default": "ASC"
+                            ]
                         }
                     },
                     {
@@ -3728,179 +3728,6 @@
                 ],
                 "x-authentication-required": false,
                 "x-action": true
-            }
-        },
-        "/v1/azure-ad-migration/reports": {
-            "post": {
-                "tags": [
-                    "cloud-azure"
-                ],
-                "summary": "Start Azure Ad Migration report generation",
-                "description": "Starts a new process in background that will generate Excel report",
-                "requestBody": {
-                    "description": "Necessary input to create a new migration report",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/AzureAdMigrationReportRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "Azure report generation started.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HrefResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Azure report generation cannot be started.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "x-required-privileges": [
-                    "Create LDAP Servers"
-                ]
-            }
-        },
-        "/v1/azure-ad-migration/reports/pending": {
-            "get": {
-                "tags": [
-                    "cloud-azure"
-                ],
-                "summary": "Get pending azure migration report",
-                "description": "Returs dto with info about pending report",
-                "responses": {
-                    "200": {
-                        "description": "Azure report dto returned.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AzureAdMigrationReportProcessStatus"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Pending report does not exist.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "x-required-privileges": [
-                    "Read LDAP Servers"
-                ]
-            }
-        },
-        "/v1/azure-ad-migration/reports/{id}": {
-            "get": {
-                "tags": [
-                    "cloud-azure"
-                ],
-                "summary": "Check status of azure ad migration report",
-                "description": "Returns dto with minimal info about running process",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Existing report ID",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Azure report status returned.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AzureAdMigrationReportProcessStatus"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Report with provided ID does not exist.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "x-required-privileges": [
-                    "Read LDAP Servers"
-                ]
-            }
-        },
-        "/v1/azure-ad-migration/reports/{id}/download": {
-            "get": {
-                "tags": [
-                    "cloud-azure"
-                ],
-                "summary": "Download report of provided report ID",
-                "description": "Returns excel file of generated report",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Existing report ID",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Azure report excel file returned.",
-                        "content": {
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
-                                "schema": {
-                                    "format": "binary"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Report with provided ID hasn't been generated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "x-required-privileges": [
-                    "Read LDAP Servers"
-                ]
             }
         },
         "/v1/branding-images/download/{id}": {
@@ -12041,6 +11868,82 @@
                 ]
             }
         },
+        "/v1/jamf-remote-assist/session": {
+            "get": {
+                "tags": [
+                    "jamf-remote-assist"
+                ],
+                "summary": "Gets session history items.\n",
+                "description": "Returns tenants sessions history.\n",
+                "responses": {
+                    "200": {
+                        "description": "Up to 100 latest session history items",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SessionHistoryItem"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Remote Administration"
+                ],
+                "x-action": true
+            }
+        },
+        "/v1/jamf-remote-assist/session/{id}": {
+            "get": {
+                "tags": [
+                    "jamf-remote-assist"
+                ],
+                "summary": "Gets single session history item.\n",
+                "description": "Returns tenants session history for specific session.\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "instance id of session",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Single session history item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SessionHistoryItem"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Session with given id does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Remote Administration"
+                ],
+                "x-action": true
+            }
+        },
         "/v1/ldap-keystore/verify": {
             "post": {
                 "tags": [
@@ -12662,7 +12565,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve available macOS and iOS Managed Software Updates",
-                "description": "Retrieves available macOS and iOS Managed Software Updates",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieves available macOS and iOS Managed Software Updates\n",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -12678,13 +12581,414 @@
                 "x-authentication-required": true
             }
         },
+        "/v1/managed-software-updates/plans": {
+            "get": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Retrieve Managed Software Update Plans",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Plans\n",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is planUuid:asc. Multiple sort criteria are supported and must be separated with a comma.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "planUuid:asc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter Managed Software Updates collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: planUuid, device.deviceId, device.objectType, updateAction, versionType, specificVersion, maxDeferrals, forceInstallLocalDateTime, state.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlans"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Managed Software Updates",
+                    "Read Computers",
+                    "Read Mobile Devices"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Create a Managed Software Update Plan",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nCreates a Managed Software Update Plan.\n",
+                "requestBody": {
+                    "description": "Managed Software Update Plan to create",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanPost"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Managed Software Update Plan was created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanPostResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Create Managed Software Updates",
+                    "Read Computers",
+                    "Read Mobile Devices",
+                    "Send Computer Remote Command to Download and Install OS X Update",
+                    "Send Mobile Device Remote Command to Download and Install iOS Update"
+                ],
+                "x-rate-limit": true
+            }
+        },
+        "/v1/managed-software-updates/plans/feature-toggle": {
+            "get": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Retrieve Status of the Feature Toggle",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieves Status of the Feature Toggle\n",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanToggle"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Managed Software Updates"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Updates Feature Toggle Value",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nUpdates the value of the Feature Toggle\n",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanToggle"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Managed Software Update Plan Feature Toggle was updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanToggle"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Managed Software Updates",
+                    "Create Managed Software Updates",
+                    "Update Managed Software Updates"
+                ]
+            }
+        },
+        "/v1/managed-software-updates/plans/group": {
+            "post": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Create Managed Software Update Plans for a Group",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nCreates Managed Software Update Plans for a Group\n",
+                "requestBody": {
+                    "description": "Managed Software Update Plan to create for Group",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanGroupPost"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Managed Software Update Plan was created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanPostResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "A group with that id does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Create Managed Software Updates",
+                    "Read Computers",
+                    "Read Mobile Devices",
+                    "Read Smart Computer Groups",
+                    "Read Static Computer Groups",
+                    "Read Smart Mobile Device Groups",
+                    "Read Static Mobile Device Groups",
+                    "Send Computer Remote Command to Download and Install OS X Update",
+                    "Send Mobile Device Remote Command to Download and Install iOS Update"
+                ],
+                "x-rate-limit": true
+            }
+        },
+        "/v1/managed-software-updates/plans/group/{id}": {
+            "get": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Retrieve Managed Software Update Plans for a Group",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieves Managed Software Update Plans for a Group\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Managed Software Update Group Id",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "group-type",
+                        "in": "query",
+                        "description": "Managed Software Update Group Type, Available options are \"COMPUTER_GROUP\" or \"MOBILE_DEVICE_GROUP\"",
+                        "required": true,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "COMPUTER_GROUP",
+                                "MOBILE_DEVICE_GROUP"
+                            ]
+                        },
+                        "example": "COMPUTER_GROUP"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlans"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Group with that id does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Managed Software Updates",
+                    "Read Computers",
+                    "Read Smart Computer Groups",
+                    "Read Static Computer Groups",
+                    "Read Mobile Devices",
+                    "Read Smart Mobile Device Groups",
+                    "Read Static Mobile Device Groups"
+                ]
+            }
+        },
+        "/v1/managed-software-updates/plans/{id}": {
+            "get": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Retrieve a Managed Software Update Plan",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieves a Managed Software Update Plan\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Managed Software Update Plan Uuid",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlan"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Managed Software Update Plan with that id does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Managed Software Updates",
+                    "Read Computers",
+                    "Read Mobile Devices"
+                ]
+            }
+        },
         "/v1/managed-software-updates/update-statuses": {
             "get": {
                 "tags": [
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses",
-                "description": "BETA Retrieve Managed Software Update Statuses",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses\n",
                 "parameters": [
                     {
                         "name": "filter",
@@ -12775,7 +13079,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Computer Groups",
-                "description": "BETA Retrieve Managed Software Update Statuses for Computer Groups",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Computer Groups\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -12845,7 +13149,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Computers",
-                "description": "BETA Retrieve Managed Software Update Statuses for Computers",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Computers\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -12913,7 +13217,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Mobile Device Groups",
-                "description": "BETA Retrieve Managed Software Update Statuses for Mobile Device Groups",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Mobile Device Groups\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -12975,7 +13279,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Mobile Devices",
-                "description": "BETA Retrieve Managed Software Update Statuses for Mobile Devices",
+                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Mobile Devices\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -14773,6 +15077,424 @@
                 ]
             }
         },
+        "/v1/onboarding": {
+            "get": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Get the current onboarding settings configuration.",
+                "description": "Get the current onboarding settings configuration.",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingConfiguration"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Onboarding Configuration"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Update the onboarding configuration.",
+                "description": "Update the onboarding configuration.",
+                "requestBody": {
+                    "description": "Onboarding settings to save.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OnboardingConfiguration"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingConfiguration"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to add invalid or ineligible items to the onboarding configuration.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update Onboarding Configuration"
+                ]
+            }
+        },
+        "/v1/onboarding/eligible-apps": {
+            "get": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Retrieves a list of applications that are eligible to be used in an onboarding configuration",
+                "description": "Retrieves a list of applications that are eligible to be used in an onboarding configuration",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "id:asc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingEligibleItemsSearchResult"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Onboarding Configuration"
+                ]
+            }
+        },
+        "/v1/onboarding/eligible-configuration-profiles": {
+            "get": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Retrieves a list of configuration profiles that are eligible to be used in an onboarding configuration",
+                "description": "Retrieves a list of configuration profiles that are eligible to be used in an onboarding configuration",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "id:asc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingEligibleItemsSearchResult"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Onboarding Configuration"
+                ]
+            }
+        },
+        "/v1/onboarding/eligible-policies": {
+            "get": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Retrieves a list of policies that are eligible to be used in an onboarding configuration",
+                "description": "Retrieves a list of policies that are eligible to be used in an onboarding configuration",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "id:asc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnboardingEligibleItemsSearchResult"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Onboarding Configuration"
+                ]
+            }
+        },
+        "/v1/onboarding/history": {
+            "get": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Get Onboarding history object\n",
+                "description": "Gets Onboarding history object\n",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "date:desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and date<2019-12-15",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of onboarding history were found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HistorySearchResults"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Onboarding Configuration"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Add Onboarding history object notes\n",
+                "description": "Adds Onboarding history object notes\n",
+                "requestBody": {
+                    "description": "history notes to create",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ObjectHistoryNote"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notes of onboarding history were added",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HrefResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Onboarding history can not be saved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update Onboarding Configuration"
+                ]
+            }
+        },
+        "/v1/onboarding/history/export": {
+            "post": {
+                "tags": [
+                    "onboarding"
+                ],
+                "summary": "Export history object collection in specified format for Onboarding\n",
+                "description": "Export history object collection in specified format for Onboarding\n",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/export-fields"
+                    },
+                    {
+                        "$ref": "#/components/parameters/export-labels"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "date:desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and date<2019-12-15",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Optional. Override query parameters since they can make URI exceed 2,000 character limit.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExportParameters"
+                            }
+                        }
+                    },
+                    "required": false
+                },
+                "responses": {
+                    "200": {
+                        "description": "Export successful",
+                        "content": {
+                            "text/csv": {
+                                "schema": {
+                                    "format": "binary",
+                                    "example": "username,date,note,details\nadmin,2019-02-04 21:09:31,Edited,item detail\n"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Export fields specified incorrectly - non-existing column or duplicate on the list.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Export currently unavailable, all export-related resources are in use. Try again later.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Onboarding Configuration"
+                ],
+                "x-action": true
+            }
+        },
         "/v1/parent-app": {
             "get": {
                 "tags": [
@@ -15550,7 +16272,7 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "instance id of department history record",
+                        "description": "instance id of Venafi CA history record",
                         "required": true,
                         "style": "simple",
                         "explode": false,
@@ -16176,6 +16898,120 @@
                     "Read Re-enrollment"
                 ],
                 "x-action": true
+            }
+        },
+        "/v1/scheduler/jobs": {
+            "get": {
+                "tags": [
+                    "scheduler"
+                ],
+                "summary": "Retrieve all Jamf Pro Scheduler jobs",
+                "description": "Retrieves the names of all Jamf Pro Scheduler jobs",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SchedulerJobs"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-authentication-required": true
+            }
+        },
+        "/v1/scheduler/jobs/{jobKey}/triggers": {
+            "get": {
+                "tags": [
+                    "scheduler"
+                ],
+                "summary": "Retrieve all triggers for a Jamf Pro Scheduler job",
+                "description": "Retrieves all triggers for a Jamf Pro Scheduler job",
+                "parameters": [
+                    {
+                        "name": "jobKey",
+                        "in": "path",
+                        "description": "Jamf Pro Scheduler Job Key",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is nextFireTime:asc. If using multiple criteria, separate with commas.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "nextFireTime:asc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter the Jamf Pro Scheduler triggers collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: triggerKey, previousFireTime, nextFireTime.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SchedulerJob"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-authentication-required": true
+            }
+        },
+        "/v1/scheduler/summary": {
+            "get": {
+                "tags": [
+                    "scheduler"
+                ],
+                "summary": "Retrieve a summary of the Jamf Pro Scheduler",
+                "description": "Retrieves a summary of the Jamf Pro Scheduler",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SchedulerSummary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-authentication-required": true
             }
         },
         "/v1/scripts": {
@@ -17294,6 +18130,239 @@
                 ]
             }
         },
+        "/v1/smtp-server": {
+            "get": {
+                "tags": [
+                    "smtp-server"
+                ],
+                "summary": "Finds the Jamf Pro SMTP Server information\n",
+                "description": "Finds the Jamf Pro STMP Server information\n",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmtpServer"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SMTP Server"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "smtp-server"
+                ],
+                "summary": "Updates Jamf Pro SMTP Server information\n",
+                "description": "Updates Jamf Pro SMTP Server information. If requiresAuthentication is set to true, a username and password must be provided\n",
+                "requestBody": {
+                    "description": "SMTP Server to update",
+                    "content": {
+                        "application/merge-patch+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SmtpServer"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmtpServer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "There was an error applying the put",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SMTP Server"
+                ]
+            }
+        },
+        "/v1/smtp-server/history": {
+            "get": {
+                "tags": [
+                    "smtp-server"
+                ],
+                "summary": "Get specified SMTP Server history object\n",
+                "description": "Get specified SMTP Server history object\n",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,username:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "example": [
+                                "date:desc"
+                            ],
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "date:desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date<2019-12-15",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of SMTP Server history were found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HistorySearchResultsV1"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Specified SMTP Server history object does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SMTP Server"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "smtp-server"
+                ],
+                "summary": "Add SMTP Server history object notes\n",
+                "description": "Adds SMTP Server history object notes\n",
+                "requestBody": {
+                    "description": "History notes to create",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ObjectHistoryNote"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notes of SMTP Server history were added",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HrefResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "SMTP Server history cannot be saved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SMTP Server"
+                ]
+            }
+        },
+        "/v1/smtp-server/test": {
+            "post": {
+                "tags": [
+                    "smtp-server"
+                ],
+                "summary": "Test functionality of an SMTP Server",
+                "description": "Test functionality of an SMTP Server",
+                "requestBody": {
+                    "description": "Recipient email to test SMTP Server",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SmtpServerTest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SMTP Server"
+                ],
+                "x-action": true
+            }
+        },
         "/v1/sso": {
             "get": {
                 "tags": [
@@ -17307,12 +18376,14 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SsoSettings"
+                                    "$ref": "#/components/schemas/SsoSettingsV1"
                                 }
                             }
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -17327,7 +18398,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/SsoSettings"
+                                "$ref": "#/components/schemas/SsoSettingsV1"
                             }
                         }
                     },
@@ -17339,7 +18410,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SsoSettings"
+                                    "$ref": "#/components/schemas/SsoSettingsV1"
                                 }
                             }
                         }
@@ -17355,6 +18426,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ]
@@ -17565,6 +18638,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -17585,6 +18660,8 @@
                         "description": "SSO object don't exist or is already disabled"
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ],
@@ -17706,6 +18783,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -17749,6 +18828,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ]
@@ -17774,6 +18855,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -17805,6 +18888,8 @@
                         "description": "provided metadata URL is not valid"
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2023-09-11",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ],
@@ -18474,6 +19559,47 @@
                     }
                 },
                 "x-authentication-required": false
+            }
+        },
+        "/v1/user/change-password": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Changes the user account password.\n",
+                "description": "Changes the account password for a currently authenticated user.\n",
+                "requestBody": {
+                    "description": "Current account password and new password.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ChangePassword"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Password for user successfully changed."
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Change Password"
+                ],
+                "x-authentication-required": true,
+                "x-action": true,
+                "x-rate-limit": false
             }
         },
         "/v1/user/preferences/settings/{keyId}": {
@@ -19482,178 +20608,6 @@
                 "x-required-privileges": [
                     "Delete Volume Purchasing Locations"
                 ]
-            }
-        },
-        "/v2/check-in": {
-            "get": {
-                "tags": [
-                    "client-check-in"
-                ],
-                "summary": "Get Client Check-In settings\n",
-                "description": "Gets `Client Check-In` object.\n",
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClientCheckInV2"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "Read Computer Check-In"
-                ],
-                "x-deprecation-date": "2021-07-15"
-            },
-            "put": {
-                "tags": [
-                    "client-check-in"
-                ],
-                "summary": "Update Client Check-In object\n",
-                "description": "Update Client Check-In object\n",
-                "requestBody": {
-                    "description": "Client Check-In object to update",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ClientCheckInV2"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Client Check-In was updated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ClientCheckInV2"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "Update Computer Check-In"
-                ],
-                "x-deprecation-date": "2021-07-15"
-            }
-        },
-        "/v2/check-in/history": {
-            "get": {
-                "tags": [
-                    "client-check-in"
-                ],
-                "summary": "Get Client Check-In history object\n",
-                "description": "Gets Client Check-In history object\n",
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/page"
-                    },
-                    {
-                        "$ref": "#/components/parameters/page-size"
-                    },
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is name:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,username:asc ",
-                        "required": false,
-                        "style": "form",
-                        "explode": true,
-                        "schema": {
-                            "type": "array",
-                            "example": [
-                                "date:desc"
-                            ],
-                            "items": {
-                                "type": "string"
-                            },
-                            "default": [
-                                "date:desc"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "filter",
-                        "in": "query",
-                        "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date<2019-12-15",
-                        "required": false,
-                        "style": "form",
-                        "explode": true,
-                        "schema": {
-                            "type": "string",
-                            "default": ""
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Details of Client Check-In history were found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HistorySearchResultsV1"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "Read Computer Check-In"
-                ],
-                "x-deprecation-date": "2021-07-15"
-            },
-            "post": {
-                "tags": [
-                    "client-check-in"
-                ],
-                "summary": "Add a Note to Client Check-In History\n",
-                "description": "Adds Client Check-In history object notes\n",
-                "requestBody": {
-                    "description": "history notes to create",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ObjectHistoryNote"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "Notes of Client Check-In history were added",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HrefResponse"
-                                }
-                            }
-                        }
-                    },
-                    "503": {
-                        "description": "Client Check-In history can not be saved",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "Update Computer Check-In"
-                ],
-                "x-deprecation-date": "2021-07-15"
             }
         },
         "/v2/cloud-ldaps": {
@@ -26386,6 +27340,72 @@
                 ]
             }
         },
+        "/v2/sso": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Retrieve the current Single Sign On configuration settings\n",
+                "description": "Retrieves the current Single Sign On configuration settings",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SsoSettingsV2"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Updates the current Single Sign On configuration settings\n",
+                "description": "Updates the current Single Sign On configuration settings",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SsoSettingsV2"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "The update was successful and the newly updated object is returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SsoSettingsV2"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Either required fields are missing or there was a validation exception.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ]
+            }
+        },
         "/v2/sso/cert": {
             "get": {
                 "tags": [
@@ -26558,6 +27578,212 @@
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ]
+            }
+        },
+        "/v2/sso/dependencies": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Retrieve the list of Enrollment Customizations using SSO\n",
+                "description": "Retrieves the list of Enrollment Customizations using SSO",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EnrollmentCustomizationDependencies"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
+                ]
+            }
+        },
+        "/v2/sso/disable": {
+            "post": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Disable SSO\n",
+                "description": "Disable SSO",
+                "responses": {
+                    "202": {
+                        "description": "SSO has been disabled"
+                    },
+                    "400": {
+                        "description": "SSO object don't exist or is already disabled"
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ],
+                "x-action": true
+            }
+        },
+        "/v2/sso/history": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Get SSO history object\n",
+                "description": "Gets SSO history object\n",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "id:desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date<2019-12-15",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of SSO history were found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HistorySearchResults"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Add SSO history object notes\n",
+                "description": "Adds SSO history object notes",
+                "requestBody": {
+                    "description": "history notes to create",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ObjectHistoryNote"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notes of SSO history were added",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HrefResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "SSO object history can not be saved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ]
+            }
+        },
+        "/v2/sso/metadata/download": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Download the Jamf Pro SAML metadata file\n",
+                "description": "Download the Jamf Pro SAML metadata file",
+                "responses": {
+                    "200": {
+                        "description": "Successful resposne",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
+                ]
+            }
+        },
+        "/v2/sso/validate": {
+            "post": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Endpoint for validation of a saml metadata url\n",
+                "description": "Validation of a content available under provided metadata URL.",
+                "requestBody": {
+                    "description": "url to validate",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SsoMetadataUrl"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "valid metadata url"
+                    },
+                    "400": {
+                        "description": "provided metadata URL is not valid"
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ],
+                "x-action": true
             }
         },
         "/v3/check-in": {
@@ -27942,6 +29168,7 @@
                     "language": {
                         "type": "string",
                         "description": "Language codes supported by Jamf Pro",
+                        "default": "en",
                         "enum": [
                             "en",
                             "de",
@@ -27949,8 +29176,7 @@
                             "es",
                             "ja",
                             "zh-hant"
-                        ],
-                        "default": "en"
+                        ]
                     },
                     "dateFormat": {
                         "type": "string",
@@ -28033,12 +29259,12 @@
                     "userAccountType": {
                         "type": "string",
                         "nullable": false,
+                        "default": "STANDARD",
                         "enum": [
                             "ADMINISTRATOR",
                             "STANDARD",
                             "SKIP"
-                        ],
-                        "default": "STANDARD"
+                        ]
                     },
                     "versionLock": {
                         "type": "integer",
@@ -28124,12 +29350,12 @@
                     "userAccountType": {
                         "type": "string",
                         "nullable": false,
+                        "default": "STANDARD",
                         "enum": [
                             "ADMINISTRATOR",
                             "STANDARD",
                             "SKIP"
-                        ],
-                        "default": "STANDARD"
+                        ]
                     },
                     "versionLock": {
                         "minimum": 0,
@@ -29149,72 +30375,6 @@
                     }
                 }
             },
-            "AzureAdMigrationReportProcessStatus": {
-                "required": [
-                    "migrationReportFinishedEpoch",
-                    "migrationReportStartedEpoch",
-                    "migrationReportStatus",
-                    "reportId"
-                ],
-                "type": "object",
-                "properties": {
-                    "reportId": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "migrationReportStatus": {
-                        "type": "string",
-                        "example": "PENDING",
-                        "enum": [
-                            "PENDING",
-                            "ABORTED",
-                            "FAILED",
-                            "FINISHED"
-                        ]
-                    },
-                    "migrationReportStartedEpoch": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "migrationReportFinishedEpoch": {
-                        "type": "integer",
-                        "example": 1
-                    }
-                },
-                "description": "Request that start report generation"
-            },
-            "AzureAdMigrationReportRequest": {
-                "required": [
-                    "azureMappings",
-                    "azureServerId",
-                    "ldapServerId"
-                ],
-                "type": "object",
-                "properties": {
-                    "ldapServerId": {
-                        "maximum": 999,
-                        "minimum": 1,
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "azureServerId": {
-                        "maximum": 65535,
-                        "minimum": 1001,
-                        "type": "integer",
-                        "example": 1001
-                    },
-                    "azureMappings": {
-                        "$ref": "#/components/schemas/AzureMappings"
-                    },
-                    "extensionAttributeMappingChanges": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ExtensionAttributeMigrationMappingChange"
-                        }
-                    }
-                },
-                "description": "Request that start report generation"
-            },
             "AzureConfiguration": {
                 "required": [
                     "cloudIdPCommon",
@@ -29792,6 +30952,29 @@
                     }
                 }
             },
+            "ChangePassword": {
+                "required": [
+                    "currentPassword",
+                    "newPassword"
+                ],
+                "type": "object",
+                "properties": {
+                    "currentPassword": {
+                        "type": "string",
+                        "format": "password",
+                        "nullable": false,
+                        "writeOnly": true,
+                        "example": "oldPassword"
+                    },
+                    "newPassword": {
+                        "type": "string",
+                        "format": "password",
+                        "nullable": false,
+                        "writeOnly": true,
+                        "example": "updatedPassword"
+                    }
+                }
+            },
             "ClassicLdapMappings": {
                 "required": [
                     "userGroupObjectMapGroupNameTo",
@@ -29865,69 +31048,6 @@
                 },
                 "description": "Classic Ldap mappings configuration"
             },
-            "ClientCheckInV2": {
-                "type": "object",
-                "properties": {
-                    "checkInFrequency": {
-                        "type": "integer",
-                        "description": "Suggested values are 5, 15, 30, or 60. Web interface will not display correctly if not one of those. Minimim is 5, maximum is 60.",
-                        "format": "int32",
-                        "default": 15
-                    },
-                    "createHooks": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "hookLog": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "hookPolicies": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "hookHideRestore": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "hookMcx": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "backgroundHooks": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "hookDisplayStatus": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "createStartupScript": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "startupLog": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "startupPolicies": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "startupSsh": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "startupMcx": {
-                        "type": "boolean",
-                        "default": false
-                    },
-                    "enableLocalConfigurationProfiles": {
-                        "type": "boolean",
-                        "default": false
-                    }
-                }
-            },
             "ClientCheckInV3": {
                 "type": "object",
                 "properties": {
@@ -29985,11 +31105,11 @@
                     },
                     "displayName": {
                         "type": "string",
-                        "example": "Google Secure LDAP"
+                        "example": "Cloud Identity Provider"
                     },
                     "providerName": {
                         "type": "string",
-                        "example": "GOOGLE",
+                        "example": "PROVIDER",
                         "enum": [
                             "GOOGLE",
                             "AZURE"
@@ -30007,11 +31127,11 @@
                 "properties": {
                     "displayName": {
                         "type": "string",
-                        "example": "Google Secure LDAP"
+                        "example": "Cloud Identity Provider"
                     },
                     "providerName": {
                         "type": "string",
-                        "example": "GOOGLE",
+                        "example": "PROVIDER",
                         "enum": [
                             "GOOGLE",
                             "AZURE"
@@ -30030,7 +31150,7 @@
                     },
                     "displayName": {
                         "type": "string",
-                        "example": "Google Secure LDAP"
+                        "example": "Cloud Identity Provider"
                     },
                     "enabled": {
                         "type": "boolean",
@@ -30038,7 +31158,7 @@
                     },
                     "providerName": {
                         "type": "string",
-                        "example": "GOOGLE",
+                        "example": "PROVIDER",
                         "enum": [
                             "GOOGLE",
                             "AZURE"
@@ -31766,6 +32886,11 @@
                         "example": true,
                         "default": false
                     },
+                    "includeSoftwareId": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": false
+                    },
                     "includeAccounts": {
                         "type": "boolean",
                         "example": true,
@@ -31812,6 +32937,11 @@
                         "default": true
                     },
                     "useUnixUserPaths": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": true
+                    },
+                    "collectUnmanagedCertificates": {
                         "type": "boolean",
                         "example": true,
                         "default": true
@@ -33565,21 +34695,21 @@
                     },
                     "mdmProfileMobileDeviceExpirationLimitInDays": {
                         "type": "integer",
+                        "default": 180,
                         "enum": [
                             90,
                             120,
                             180
-                        ],
-                        "default": 180
+                        ]
                     },
                     "mdmProfileComputerExpirationLimitInDays": {
                         "type": "integer",
+                        "default": 180,
                         "enum": [
                             90,
                             120,
                             180
-                        ],
-                        "default": 180
+                        ]
                     }
                 }
             },
@@ -35022,13 +36152,13 @@
                     },
                     "flushMdmCommandsOnReenroll": {
                         "type": "string",
+                        "default": "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED",
                         "enum": [
                             "DELETE_NOTHING",
                             "DELETE_ERRORS",
                             "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED",
                             "DELETE_EVERYTHING"
-                        ],
-                        "default": "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED"
+                        ]
                     },
                     "macOsEnterpriseEnrollmentEnabled": {
                         "type": "boolean",
@@ -35060,11 +36190,11 @@
                         "type": "string",
                         "description": "passwordType is no longer in use. Input value for passwordType will be ignored.",
                         "deprecated": true,
+                        "default": "STATIC",
                         "enum": [
                             "STATIC",
                             "RANDOM"
                         ],
-                        "default": "STATIC",
                         "x-deprecation-date": "2023-05-08"
                     },
                     "randomPasswordLength": {
@@ -35118,11 +36248,11 @@
                     },
                     "personalDeviceEnrollmentType": {
                         "type": "string",
+                        "default": "PERSONALDEVICEPROFILES",
                         "enum": [
                             "USERENROLLMENT",
                             "PERSONALDEVICEPROFILES"
-                        ],
-                        "default": "PERSONALDEVICEPROFILES"
+                        ]
                     },
                     "accountDrivenUserEnrollmentEnabled": {
                         "type": "boolean",
@@ -35169,13 +36299,13 @@
                     },
                     "flushMdmCommandsOnReenroll": {
                         "type": "string",
+                        "default": "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED",
                         "enum": [
                             "DELETE_NOTHING",
                             "DELETE_ERRORS",
                             "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED",
                             "DELETE_EVERYTHING"
-                        ],
-                        "default": "DELETE_EVERYTHING_EXCEPT_ACKNOWLEDGED"
+                        ]
                     },
                     "macOsEnterpriseEnrollmentEnabled": {
                         "type": "boolean",
@@ -35229,13 +36359,17 @@
                     },
                     "personalDeviceEnrollmentType": {
                         "type": "string",
+                        "default": "PERSONALDEVICEPROFILES",
                         "enum": [
                             "USERENROLLMENT",
                             "PERSONALDEVICEPROFILES"
-                        ],
-                        "default": "PERSONALDEVICEPROFILES"
+                        ]
                     },
                     "accountDrivenUserEnrollmentEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "accountDrivenDeviceEnrollmentEnabled": {
                         "type": "boolean",
                         "default": false
                     }
@@ -35262,6 +36396,61 @@
                     "managementHint": {
                         "type": "string",
                         "default": ""
+                    }
+                }
+            },
+            "EraseDeviceCommand": {
+                "type": "object",
+                "properties": {
+                    "preserveDataPlan": {
+                        "type": "boolean",
+                        "description": "If true, preserve the data plan on an iPhone or iPad with eSIM functionality, if one exists. This value is available in iOS 11 and later.",
+                        "example": true,
+                        "default": false
+                    },
+                    "disallowProximitySetup": {
+                        "type": "boolean",
+                        "description": "If true, disable Proximity Setup on the next reboot and skip the pane in Setup Assistant. This value is available in iOS 11 and later. Prior to iOS 14, don’t use this option with any other option.",
+                        "example": true,
+                        "default": false
+                    },
+                    "pin": {
+                        "maxLength": 6,
+                        "minLength": 6,
+                        "type": "string",
+                        "description": "The six-character PIN for Find My. This value is available in macOS 10.8 and later.",
+                        "example": "123456"
+                    },
+                    "obliterationBehavior": {
+                        "type": "string",
+                        "description": "This key defines the fallback behavior for erasing a device.",
+                        "example": "Default",
+                        "enum": [
+                            "Default",
+                            "DoNotObliterate",
+                            "ObliterateWithWarning",
+                            "Always"
+                        ]
+                    },
+                    "returnToService": {
+                        "type": "object",
+                        "properties": {
+                            "enabled": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "mdmProfileData": {
+                                "type": "string",
+                                "description": "Base64 encoded mdm profile",
+                                "example": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHBsaXN0IFBVQkxJQyAiLS8vQXBwbGUvL0RURCBQTElTVCAxLjAvL0VOIiAiaHR0cDovL3d3dy5hcHBsZS5jb20vRFREcy9Qcm9wZXJ0eUxpc3QtMS4wLmR0ZCI+CjxwbGlzdCB2ZXJzaW9uPSIxIj4KICAgIDxkaWN0PgogICAgICAgIDxrZXk+UGF5bG9hZFVVSUQ8L2tleT4KICAgICAgICA8c3RyaW5nPjAwMDAwMDAwLTAwMDAtMDAwMC1BMDAwLTRBNDE0RDQ2MDAwMzwvc3RyaW5nPgogICAgICAgIDxrZXk+UGF5bG9hZFR5cGU8L2tleT4KICAgICAgICA8c3RyaW5nPkNvbmZpZ3VyYXRpb248L3N0cmluZz4KICAgICAgICA8a2V5PlBheWxvYWRPcmdhbml6YXRpb248L2tleT4KICAgICAgICA8c3RyaW5nPkphbWYgUHJvPC9zdHJpbmc+CiAgICAgICAgPGtleT5QYXlsb2FkSWRlbnRpZmllcjwva2V5PgogICAgICAgIDxzdHJpbmc+MDAwMDAwMDAtMDAwMC0wMDAwLUEwMDAtNEE0MTRENDYwMDAzPC9zdHJpbmc+CiAgICAgICAgPGtleT5QYXlsb2FkRGlzcGxheU5hbWU8L2tleT4KICAgICAgICA8c3RyaW5nPk1ETSBQcm9maWxlPC9zdHJpbmc+CiAgICAgICAgPGtleT5QYXlsb2FkRGVzY3JpcHRpb248L2tleT4KICAgICAgICA8c3RyaW5nPk1ETSBQcm9maWxlIGZvciBtb2JpbGUgZGV2aWNlIG1hbmFnZW1lbnQ8L3N0cmluZz4KICAgICAgICA8a2V5PlBheWxvYWRWZXJzaW9uPC9rZXk+CiAgICAgICAgPGludGVnZXI+MTwvaW50ZWdlcj4KICAgICAgICA8a2V5PlBheWxvYWRFbmFibGVkPC9rZXk+CiAgICAgICAgPHRydWUgLz4KICAgICAgICA8a2V5PlBheWxvYWRSZW1vdmFsRGlzYWxsb3dlZDwva2V5PgogICAgICAgIDxmYWxzZSAvPgogICAgICAgIDxrZXk+UGF5bG9hZENvbnRlbnQ8L2tleT4KICAgICAgICA8YXJyYXk+CiAgICAgICAgICAgIDxkaWN0PgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkVVVJRDwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz5FQjA1RURCNy04MzYxLTQ1N0ItQjUyOC0wQjFCMjU2QTY2QUY8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZFR5cGU8L2tleT4KICAgICAgICAgICAgICAgIDxzdHJpbmc+Y29tLmFwcGxlLnNlY3VyaXR5LnJvb3Q8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZE9yZ2FuaXphdGlvbjwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz5KYW1mIFBybzwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkSWRlbnRpZmllcjwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz5FQjA1RURCNy04MzYxLTQ1N0ItQjUyOC0wQjFCMjU2QTY2QUY8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZERpc3BsYXlOYW1lPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPkNOPUphbWYgUHJvIEpTUyBCdWlsdC1pbiBDZXJ0aWZpY2F0ZSBBdXRob3JpdHk8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZERlc2NyaXB0aW9uPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPkEgUm9vdCBDQSBDZXJ0aWZpY2F0ZTwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkVmVyc2lvbjwva2V5PgogICAgICAgICAgICAgICAgPGludGVnZXI+MTwvaW50ZWdlcj4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZEVuYWJsZWQ8L2tleT4KICAgICAgICAgICAgICAgIDx0cnVlIC8+CiAgICAgICAgICAgICAgICA8a2V5PlBheWxvYWRDZXJ0aWZpY2F0ZUZpbGVOYW1lPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPkNOPUphbWYgUHJvIEpTUyBCdWlsdC1pbiBDZXJ0aWZpY2F0ZSBBdXRob3JpdHk8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZENvbnRlbnQ8L2tleT4KICAgICAgICAgICAgICAgIDxkYXRhPgogICAgICAgICAgICAgICAgICAgIHBheWxvYWRDb250ZW50CiAgICAgICAgICAgICAgICA8L2RhdGE+CiAgICAgICAgICAgICAgICA8a2V5PkFsbG93QWxsQXBwc0FjY2Vzczwva2V5PgogICAgICAgICAgICAgICAgPGZhbHNlIC8+CiAgICAgICAgICAgIDwvZGljdD4KICAgICAgICAgICAgPGRpY3Q+CiAgICAgICAgICAgICAgICA8a2V5PlBheWxvYWRVVUlEPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPjAwMDAwMDAwLTAwMDAtMDAwMC1BMDAwLTRBNDE0RDQ2MDAwNjwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkVHlwZTwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz5jb20uYXBwbGUuc2VjdXJpdHkuc2NlcDwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkT3JnYW5pemF0aW9uPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPkphbWYgUHJvPC9zdHJpbmc+CiAgICAgICAgICAgICAgICA8a2V5PlBheWxvYWRJZGVudGlmaWVyPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPmNvbS5qYW1mc29mdHdhcmUuZW5jcnlwdGVkLXByb2ZpbGUtc2VydmljZS1zY2VwMjwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkRGlzcGxheU5hbWU8L2tleT4KICAgICAgICAgICAgICAgIDxzdHJpbmc+SkFNRiBFbnJvbGxtZW50IFBheWxvYWQ6IFNDRVA8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZERlc2NyaXB0aW9uPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPkNvbmZpZ3VyYXRpb24gdG8gY29ubmVjdCB0byB5b3VyIFNDRVAgU2VydmVyPC9zdHJpbmc+CiAgICAgICAgICAgICAgICA8a2V5PlBheWxvYWRWZXJzaW9uPC9rZXk+CiAgICAgICAgICAgICAgICA8aW50ZWdlcj4xPC9pbnRlZ2VyPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkRW5hYmxlZDwva2V5PgogICAgICAgICAgICAgICAgPHRydWUgLz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZENvbnRlbnQ8L2tleT4KICAgICAgICAgICAgICAgIDxkaWN0PgogICAgICAgICAgICAgICAgICAgIDxrZXk+VVJMPC9rZXk+CiAgICAgICAgICAgICAgICAgICAgPHN0cmluZz5odHRwczovL2pzcy51cmwvQ0EvU0NFUDwvc3RyaW5nPgogICAgICAgICAgICAgICAgICAgIDxrZXk+Q2hhbGxlbmdlPC9rZXk+CiAgICAgICAgICAgICAgICAgICAgPHN0cmluZz4wMDAwMDwvc3RyaW5nPgogICAgICAgICAgICAgICAgICAgIDxrZXk+S2V5IFR5cGU8L2tleT4KICAgICAgICAgICAgICAgICAgICA8c3RyaW5nPlJTQTwvc3RyaW5nPgogICAgICAgICAgICAgICAgICAgIDxrZXk+S2V5IFVzYWdlPC9rZXk+CiAgICAgICAgICAgICAgICAgICAgPGludGVnZXI+NTwvaW50ZWdlcj4KICAgICAgICAgICAgICAgICAgICA8a2V5PktleXNpemU8L2tleT4KICAgICAgICAgICAgICAgICAgICA8aW50ZWdlcj4yMDQ4PC9pbnRlZ2VyPgogICAgICAgICAgICAgICAgICAgIDxrZXk+U3ViamVjdDwva2V5PgogICAgICAgICAgICAgICAgICAgIDxhcnJheT4KICAgICAgICAgICAgICAgICAgICAgICAgPGFycmF5PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGFycmF5PgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzdHJpbmc+Tzwvc3RyaW5nPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzdHJpbmc+SmFtZiBQcm88L3N0cmluZz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvYXJyYXk+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvYXJyYXk+CiAgICAgICAgICAgICAgICAgICAgICAgIDxhcnJheT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxhcnJheT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3RyaW5nPkNOPC9zdHJpbmc+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPHN0cmluZz40RkY0QzJEQi0wRDhDLTREQjEtODUyNi04RTFGQUQ3ODg4RTQ8L3N0cmluZz4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDwvYXJyYXk+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvYXJyYXk+CiAgICAgICAgICAgICAgICAgICAgPC9hcnJheT4KICAgICAgICAgICAgICAgIDwvZGljdD4KICAgICAgICAgICAgPC9kaWN0PgogICAgICAgICAgICA8ZGljdD4KICAgICAgICAgICAgICAgIDxrZXk+QWNjZXNzUmlnaHRzPC9rZXk+CiAgICAgICAgICAgICAgICA8aW50ZWdlcj44MTkxPC9pbnRlZ2VyPgogICAgICAgICAgICAgICAgPGtleT5DaGVja0luVVJMPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPgogICAgICAgICAgICAgICAgICAgIGh0dHBzOi8vanNzLnVybC9tZG0vQ2hlY2tJblVSTD9pbnZpdGF0aW9uPTI4MzY5MDc2MzU4NzI1MjExMzI4MzE0ODcxNjEyNjI2MzkxMzQxOTwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5DaGVja091dFdoZW5SZW1vdmVkPC9rZXk+CiAgICAgICAgICAgICAgICA8dHJ1ZSAvPgogICAgICAgICAgICAgICAgPGtleT5JZGVudGl0eUNlcnRpZmljYXRlVVVJRDwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz4wMDAwMDAwMC0wMDAwLTAwMDAtQTAwMC00QTQxNEQ0NjAwMDY8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZERlc2NyaXB0aW9uPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPkNvbmZpZ3VyYXRpb24gdG8gY29ubmVjdCB0byB5b3VyIE1ETSBTZXJ2ZXI8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZERpc3BsYXlOYW1lPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPkpBTUYgTWFudWFsIEVucm9sbG1lbnQgUGF5bG9hZDogTURNPC9zdHJpbmc+CiAgICAgICAgICAgICAgICA8a2V5PlBheWxvYWRFbmFibGVkPC9rZXk+CiAgICAgICAgICAgICAgICA8dHJ1ZSAvPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkSWRlbnRpZmllcjwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz4wMDAwMDAwMC0wMDAwLTAwMDAtQTAwMC00QTQxNEQ0NjAwMDQ8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+UGF5bG9hZE9yZ2FuaXphdGlvbjwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz5KYW1mIFBybzwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkVHlwZTwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz5jb20uYXBwbGUubWRtPC9zdHJpbmc+CiAgICAgICAgICAgICAgICA8a2V5PlBheWxvYWRVVUlEPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPjAwMDAwMDAwLTAwMDAtMDAwMC1BMDAwLTRBNDE0RDQ2MDAwNDwvc3RyaW5nPgogICAgICAgICAgICAgICAgPGtleT5QYXlsb2FkVmVyc2lvbjwva2V5PgogICAgICAgICAgICAgICAgPGludGVnZXI+MTwvaW50ZWdlcj4KICAgICAgICAgICAgICAgIDxrZXk+U2VydmVyVVJMPC9rZXk+CiAgICAgICAgICAgICAgICA8c3RyaW5nPmh0dHBzOi8vanNzLnVybC9tZG0vU2VydmVyVVJMPC9zdHJpbmc+CiAgICAgICAgICAgICAgICA8a2V5PlNpZ25NZXNzYWdlPC9rZXk+CiAgICAgICAgICAgICAgICA8dHJ1ZSAvPgogICAgICAgICAgICAgICAgPGtleT5Ub3BpYzwva2V5PgogICAgICAgICAgICAgICAgPHN0cmluZz5jb20uYXBwbGUubWdtdC5FeHRlcm5hbC5hYWFhYWFhYS1hYWFhLWFhYWEtYWFhLWFhYWFhYWE8L3N0cmluZz4KICAgICAgICAgICAgICAgIDxrZXk+VXNlRGV2ZWxvcG1lbnRBUE5TPC9rZXk+CiAgICAgICAgICAgICAgICA8ZmFsc2UgLz4KICAgICAgICAgICAgICAgIDxrZXk+U2VydmVyQ2FwYWJpbGl0aWVzPC9rZXk+CiAgICAgICAgICAgICAgICA8YXJyYXk+CiAgICAgICAgICAgICAgICAgICAgPHN0cmluZz5jb20uYXBwbGUubWRtLnBlci11c2VyLWNvbm5lY3Rpb25zPC9zdHJpbmc+CiAgICAgICAgICAgICAgICA8L2FycmF5PgogICAgICAgICAgICA8L2RpY3Q+CiAgICAgICAgPC9hcnJheT4KICAgIDwvZGljdD4KPC9wbGlzdD4="
+                            },
+                            "wifiProfileData": {
+                                "type": "string",
+                                "description": "Base64 encoded wifi profile",
+                                "example": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCFET0NUWVBFIHBsaXN0IFBVQkxJQyAiLS8vQXBwbGUvL0RURCBQTElTVCAxLjAvL0VOIiAiaHR0cDovL3d3dy5hcHBsZS5jb20vRFREcy9Qcm9wZXJ0eUxpc3QtMS4wLmR0ZCI+CjxwbGlzdCB2ZXJzaW9uPSIxLjAiPgo8ZGljdD4KCTxrZXk+UGF5bG9hZENvbnRlbnQ8L2tleT4KCTxhcnJheT4KCQk8ZGljdD4KCQkJPGtleT5BdXRvSm9pbjwva2V5PgoJCQk8dHJ1ZS8+CgkJCTxrZXk+Q2FwdGl2ZUJ5cGFzczwva2V5PgoJCQk8ZmFsc2UvPgoJCQk8a2V5PkRpc2FibGVBc3NvY2lhdGlvbk1BQ1JhbmRvbWl6YXRpb248L2tleT4KCQkJPGZhbHNlLz4KCQkJPGtleT5FbmNyeXB0aW9uVHlwZTwva2V5PgoJCQk8c3RyaW5nPldQQTwvc3RyaW5nPgoJCQk8a2V5PkhJRERFTl9ORVRXT1JLPC9rZXk+CgkJCTxmYWxzZS8+CgkJCTxrZXk+SXNIb3RzcG90PC9rZXk+CgkJCTxmYWxzZS8+CgkJCTxrZXk+UGFzc3dvcmQ8L2tleT4KCQkJPHN0cmluZz53aWZpUGFzc3dvcmQ8L3N0cmluZz4KCQkJPGtleT5QYXlsb2FkRGVzY3JpcHRpb248L2tleT4KCQkJPHN0cmluZz5Db25maWd1cmVzIFdpLUZpIHNldHRpbmdzPC9zdHJpbmc+CgkJCTxrZXk+UGF5bG9hZERpc3BsYXlOYW1lPC9rZXk+CgkJCTxzdHJpbmc+V2ktRmk8L3N0cmluZz4KCQkJPGtleT5QYXlsb2FkSWRlbnRpZmllcjwva2V5PgoJCQk8c3RyaW5nPmNvbS5hcHBsZS53aWZpLm1hbmFnZWQuRDA1QzhDQzQtMzNGNi00OEVFLUEwNzMtM0M1M0VGOTExQUIzPC9zdHJpbmc+CgkJCTxrZXk+UGF5bG9hZFR5cGU8L2tleT4KCQkJPHN0cmluZz5jb20uYXBwbGUud2lmaS5tYW5hZ2VkPC9zdHJpbmc+CgkJCTxrZXk+UGF5bG9hZFVVSUQ8L2tleT4KCQkJPHN0cmluZz5EMDVDOENDNC0zM0Y2LTQ4RUUtQTA3My0zQzUzRUY5MTFBQjM8L3N0cmluZz4KCQkJPGtleT5QYXlsb2FkVmVyc2lvbjwva2V5PgoJCQk8aW50ZWdlcj4xPC9pbnRlZ2VyPgoJCQk8a2V5PlByb3h5VHlwZTwva2V5PgoJCQk8c3RyaW5nPk5vbmU8L3N0cmluZz4KCQkJPGtleT5TU0lEX1NUUjwva2V5PgoJCQk8c3RyaW5nPlNTSUQ8L3N0cmluZz4KCQk8L2RpY3Q+Cgk8L2FycmF5PgoJPGtleT5QYXlsb2FkRGlzcGxheU5hbWU8L2tleT4KCTxzdHJpbmc+VW50aXRsZWQ8L3N0cmluZz4KCTxrZXk+UGF5bG9hZElkZW50aWZpZXI8L2tleT4KCTxzdHJpbmc+Y29yZXkuODcxOUQ0RTktQTYxMy00OTg4LTlFQjctOUYzNzdGMEUwMEMwPC9zdHJpbmc+Cgk8a2V5PlBheWxvYWRSZW1vdmFsRGlzYWxsb3dlZDwva2V5PgoJPGZhbHNlLz4KCTxrZXk+UGF5bG9hZFR5cGU8L2tleT4KCTxzdHJpbmc+Q29uZmlndXJhdGlvbjwvc3RyaW5nPgoJPGtleT5QYXlsb2FkVVVJRDwva2V5PgoJPHN0cmluZz42MkZGQzZBRC1GMDFDLTRENzQtQUIwQS1EMEM0N0QzQjdBMDc8L3N0cmluZz4KCTxrZXk+UGF5bG9hZFZlcnNpb248L2tleT4KCTxpbnRlZ2VyPjE8L2ludGVnZXI+CjwvZGljdD4KPC9wbGlzdD4="
+                            }
+                        },
+                        "description": "The configuration settings for Return to Service."
                     }
                 }
             },
@@ -35358,29 +36547,6 @@
                         "example": false
                     }
                 }
-            },
-            "ExtensionAttributeMigrationMappingChange": {
-                "required": [
-                    "multiValue",
-                    "source",
-                    "target"
-                ],
-                "type": "object",
-                "properties": {
-                    "source": {
-                        "type": "string",
-                        "example": "userName"
-                    },
-                    "target": {
-                        "type": "string",
-                        "example": "displayName"
-                    },
-                    "multiValue": {
-                        "type": "boolean",
-                        "example": true
-                    }
-                },
-                "description": "Extension Attribute mapping change"
             },
             "ExtensionAttributeV2": {
                 "type": "object",
@@ -36072,10 +37238,10 @@
                     "frequency": {
                         "type": "string",
                         "example": "DAILY",
+                        "default": "DAILY",
                         "enum": [
                             "DAILY"
-                        ],
-                        "default": "DAILY"
+                        ]
                     }
                 }
             },
@@ -38153,13 +39319,13 @@
                     "autoDeploymentType": {
                         "type": "string",
                         "description": "Determines how the server will behave regarding application updates and installs on the devices that have the configuration profile installed. * `PATCH_UPDATES` - Server handles initial installation of the application and any patch updates. * `MINOR_AND_PATCH_UPDATES` - Server handles initial installation of the application and any patch and minor updates. * `INITIAL_INSTALLATION_ONLY` - Server only handles initial installation of the application. Updates will have to be done manually. * `NONE` - Server does not handle any installations or updates for the application. Version is ignored for this type.\n",
+                        "default": "NONE",
                         "enum": [
                             "PATCH_UPDATES",
                             "MINOR_AND_PATCH_UPDATES",
                             "INITIAL_INSTALLATION_ONLY",
                             "NONE"
-                        ],
-                        "default": "NONE"
+                        ]
                     }
                 }
             },
@@ -38487,11 +39653,11 @@
                         "type": "string",
                         "description": "Priority can only be configured on macOS 12.3 and above, for minor updates only. Any version below 12.3 is always Low and cannot be changed until prerequisites are met. When qualified, if not explicitly set, priority will default to High",
                         "example": "HIGH",
+                        "default": "HIGH",
                         "enum": [
                             "HIGH",
                             "LOW"
-                        ],
-                        "default": "HIGH"
+                        ]
                     }
                 }
             },
@@ -38512,6 +39678,171 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/ApiErrorCause"
+                        }
+                    }
+                }
+            },
+            "ManagedSoftwareUpdatePlan": {
+                "required": [
+                    "device",
+                    "maxDeferrals",
+                    "planUuid",
+                    "status",
+                    "updateAction",
+                    "versionType"
+                ],
+                "type": "object",
+                "properties": {
+                    "planUuid": {
+                        "minLength": 1,
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "6E47EF55-5318-494F-A09E-70F613E0AFD1"
+                    },
+                    "device": {
+                        "$ref": "#/components/schemas/PlanDevice"
+                    },
+                    "updateAction": {
+                        "type": "string",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": "DOWNLOAD_INSTALL",
+                        "enum": [
+                            "DOWNLOAD_ONLY",
+                            "DOWNLOAD_INSTALL",
+                            "DOWNLOAD_INSTALL_ALLOW_DEFERRAL",
+                            "DOWNLOAD_INSTALL_RESTART",
+                            "DOWNLOAD_INSTALL_SCHEDULE",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "versionType": {
+                        "type": "string",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": "SPECIFIC_VERSION",
+                        "enum": [
+                            "LATEST_MAJOR",
+                            "LATEST_MINOR",
+                            "LATEST_ANY",
+                            "SPECIFIC_VERSION",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "specificVersion": {
+                        "type": "string",
+                        "description": "Optional. Indicates the specific version to update to. Only available when the version type is set to specific version, otherwise defaults to NO_SPECIFIC_VERSION.",
+                        "readOnly": true,
+                        "example": "12.6.1",
+                        "default": "NO_SPECIFIC_VERSION"
+                    },
+                    "maxDeferrals": {
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "Not applicable to all managed software update plans",
+                        "readOnly": true,
+                        "example": 5
+                    },
+                    "forceInstallLocalDateTime": {
+                        "type": "string",
+                        "description": "Optional. Indicates the local date and time of the device to force update by.",
+                        "nullable": true,
+                        "example": "2023-12-25T21:09:31"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/PlanStatus"
+                    }
+                }
+            },
+            "ManagedSoftwareUpdatePlanGroupPost": {
+                "required": [
+                    "config",
+                    "group"
+                ],
+                "type": "object",
+                "properties": {
+                    "group": {
+                        "$ref": "#/components/schemas/PlanGroupPost"
+                    },
+                    "config": {
+                        "$ref": "#/components/schemas/PlanConfigurationPost"
+                    }
+                }
+            },
+            "ManagedSoftwareUpdatePlanPost": {
+                "required": [
+                    "config",
+                    "devices"
+                ],
+                "type": "object",
+                "properties": {
+                    "devices": {
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PlanDevicePost"
+                        }
+                    },
+                    "config": {
+                        "$ref": "#/components/schemas/PlanConfigurationPost"
+                    }
+                }
+            },
+            "ManagedSoftwareUpdatePlanPostResponse": {
+                "type": "object",
+                "properties": {
+                    "plans": {
+                        "minItems": 0,
+                        "uniqueItems": true,
+                        "type": "array",
+                        "readOnly": true,
+                        "items": {
+                            "$ref": "#/components/schemas/PlanDeviceResponse"
+                        }
+                    }
+                }
+            },
+            "ManagedSoftwareUpdatePlanToggle": {
+                "required": [
+                    "toggle"
+                ],
+                "type": "object",
+                "properties": {
+                    "toggle": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "example": false
+                    },
+                    "forceInstallLocalDateEnabled": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": false
+                    },
+                    "dssEnabled": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": false
+                    }
+                },
+                "nullable": false
+            },
+            "ManagedSoftwareUpdatePlans": {
+                "type": "object",
+                "properties": {
+                    "totalCount": {
+                        "minimum": 0,
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "results": {
+                        "minItems": 0,
+                        "type": "array",
+                        "readOnly": true,
+                        "items": {
+                            "$ref": "#/components/schemas/ManagedSoftwareUpdatePlan"
                         }
                     }
                 }
@@ -38719,6 +40050,9 @@
                                 "$ref": "#/components/schemas/EnableLostModeCommand"
                             },
                             {
+                                "$ref": "#/components/schemas/EraseDeviceCommand"
+                            },
+                            {
                                 "$ref": "#/components/schemas/DeleteUserCommand"
                             },
                             {
@@ -38775,95 +40109,16 @@
                 "type": "string",
                 "example": "ENABLE_LOST_MODE",
                 "enum": [
-                    "DEVICE_LOCATION",
                     "ENABLE_LOST_MODE",
-                    "ACTIVATION_LOCK_BYPASS_CODE",
-                    "CLEAR_ACTIVATION_LOCK_BYPASS_CODE",
-                    "ACCOUNT_CONFIGURATION",
-                    "REFRESH_CELLULAR_PLANS",
                     "SETTINGS",
-                    "CONTENT_CACHING_INFORMATION",
-                    "UNMANAGE_DEVICE",
                     "ERASE_DEVICE",
-                    "DEVICE_LOCK",
-                    "CLEAR_PASSCODE",
                     "DELETE_USER",
-                    "DEVICE_INFORMATION",
                     "SHUT_DOWN_DEVICE",
                     "RESTART_DEVICE",
-                    "INSTALL_BYO_PROFILE",
-                    "REMOVE_PROFILE",
-                    "INSTALL_PROFILE",
-                    "REINSTALL_PROFILE",
-                    "INSTALL_PROVISIONING_PROFILE",
-                    "PROFILE_LIST",
-                    "REMOVE_PROVISIONING_PROFILE",
-                    "CERTIFICATE_LIST",
-                    "INSTALLED_APPLICATION_LIST",
-                    "MANAGED_APPLICATION_LIST",
-                    "INSTALL_APPLICATION",
-                    "INSTALL_ENTERPRISE_APPLICATION",
-                    "INSTALL_PACKAGE",
-                    "REMOVE_APPLICATION",
-                    "MANAGED_MEDIA_LIST",
-                    "INSTALL_MEDIA",
-                    "REMOVE_MEDIA",
-                    "APPLY_REDEMPTION_CODE",
-                    "SETTINGS_ENABLE_PERSONAL_HOTSPOT",
-                    "SETTINGS_DISABLE_PERSONAL_HOTSPOT",
-                    "UPDATE_INVENTORY",
-                    "WALLPAPER",
-                    "DEVICE_CONFIGURED",
-                    "RESTRICTIONS",
-                    "ENABLE_REMOTE_DESKTOP",
-                    "DISABLE_REMOTE_DESKTOP",
-                    "SECURITY_INFO",
-                    "MARK_AS_UNMANAGED",
-                    "QUERY_RESPONSES",
-                    "AVAILABLE_OS_UPDATES",
-                    "PROVISIONING_PROFILE_LIST",
-                    "SCHEDULE_OS_UPDATE",
-                    "OS_UPDATE_STATUS",
-                    "INVITE_TO_PROGRAM",
-                    "PUSH_TRIGGER",
-                    "CLEAR_RESTRICTIONS_PASSWORD",
-                    "BLANK_PUSH",
-                    "CORPORATE_WIPE",
-                    "DEVICE_INFO_ACCOUNT_HASH",
-                    "DEVICE_INFO_ITUNES_ACTIVE",
-                    "DEVICE_INFO_LAST_CLOUD_BACKUP_DATE",
-                    "DEVICE_INFO_ACTIVE_MANAGED_USERS",
-                    "DEVICE_NAME",
-                    "ENABLE_ACTIVATION_LOCK",
-                    "DISABLE_ACTIVATION_LOCK",
-                    "LAST_CLOUD_BACKUP_DATE",
-                    "MARK_AS_CORPORATE_WIPE",
-                    "REQUEST_MIRRORING",
-                    "SETTINGS_DISABLE_DATA_ROAMING",
-                    "SETTINGS_DISABLE_VOICE_ROAMING",
-                    "SETTINGS_DISABLE_DIAGNOSTIC_SUBMISSION",
-                    "SETTINGS_DISABLE_APP_ANALYTICS",
-                    "SETTINGS_ENABLE_DATA_ROAMING",
-                    "SETTINGS_ENABLE_VOICE_ROAMING",
-                    "SETTINGS_ENABLE_DIAGNOSTIC_SUBMISSION",
-                    "SETTINGS_ENABLE_APP_ANALYTICS",
-                    "SETTINGS_ENABLE_BLUETOOTH",
-                    "SETTINGS_DISABLE_BLUETOOTH",
-                    "SETTINGS_MOBILE_DEVICE_PER_APP_VPN",
-                    "SETTINGS_MOBILE_DEVICE_APPLICATION_ATTRIBUTES",
-                    "STOP_MIRRORING",
-                    "PASSCODE_LOCK_GRACE_PERIOD",
-                    "SCHEDULE_OS_UPDATE_SCAN",
-                    "PLAY_LOST_MODE_SOUND",
-                    "DISABLE_LOST_MODE",
                     "LOG_OUT_USER",
-                    "USER_LIST",
-                    "VALIDATE_APPLICATIONS",
-                    "UNLOCK_USER_ACCOUNT",
                     "SET_RECOVERY_LOCK",
                     "DECLARATIVE_MANAGEMENT",
-                    "SET_AUTO_ADMIN_PASSWORD",
-                    "UNKNOWN"
+                    "SET_AUTO_ADMIN_PASSWORD"
                 ]
             },
             "MembershipMappings": {
@@ -39594,7 +40849,8 @@
                             "Institutional",
                             "PersonalDeviceProfile",
                             "UserEnrollment",
-                            "AccountDrivenUserEnrollment"
+                            "AccountDrivenUserEnrollment",
+                            "AccountDrivenDeviceEnrollment"
                         ]
                     },
                     "enrollmentMethodPrestage": {
@@ -41216,6 +42472,119 @@
                     }
                 }
             },
+            "OnboardingConfiguration": {
+                "required": [
+                    "enabled",
+                    "onboardingItems"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "1"
+                    },
+                    "enabled": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "example": true
+                    },
+                    "onboardingItems": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OnboardingItem"
+                        }
+                    }
+                }
+            },
+            "OnboardingEligibleItem": {
+                "required": [
+                    "id",
+                    "name",
+                    "scopeDescription",
+                    "siteDescription"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "Item 1"
+                    },
+                    "scopeDescription": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "All Computers"
+                    },
+                    "siteDescription": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "Example Site"
+                    }
+                }
+            },
+            "OnboardingEligibleItemsSearchResult": {
+                "type": "object",
+                "properties": {
+                    "totalCount": {
+                        "type": "integer",
+                        "nullable": false,
+                        "example": 1
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OnboardingEligibleItem"
+                        }
+                    }
+                },
+                "description": "A list of onboarding eligible items"
+            },
+            "OnboardingItem": {
+                "required": [
+                    "entityId",
+                    "priority",
+                    "selfServiceEntityType"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "3"
+                    },
+                    "entityId": {
+                        "type": "string",
+                        "description": "The id of the Jamf Pro object that should be added to the onboarding workflow for end users.\nUse this in conjunction with the selfServiceEntityType. For example, if the policy with id 132\nshould be added to onboarding, then entityId should be 132 and selfServiceEntityType should be \nOS_X_POLICY.\n",
+                        "nullable": false,
+                        "example": "1"
+                    },
+                    "selfServiceEntityType": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "OS_X_POLICY",
+                        "enum": [
+                            "OS_X_POLICY",
+                            "OS_X_CONFIG_PROFILE",
+                            "OS_X_MAC_APP",
+                            "OS_X_APP_INSTALLER",
+                            "OS_X_EBOOK",
+                            "OS_X_PATCH_POLICY",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "priority": {
+                        "type": "integer",
+                        "nullable": false,
+                        "example": 35
+                    }
+                }
+            },
             "OrderBy": {
                 "type": "object",
                 "properties": {
@@ -42056,6 +43425,156 @@
                     "DISABLE_PERSONAL_HOTSPOT"
                 ]
             },
+            "PlanConfigurationPost": {
+                "required": [
+                    "updateAction",
+                    "versionType"
+                ],
+                "type": "object",
+                "properties": {
+                    "updateAction": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "DOWNLOAD_INSTALL",
+                        "enum": [
+                            "DOWNLOAD_ONLY",
+                            "DOWNLOAD_INSTALL",
+                            "DOWNLOAD_INSTALL_ALLOW_DEFERRAL",
+                            "DOWNLOAD_INSTALL_RESTART",
+                            "DOWNLOAD_INSTALL_SCHEDULE",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "versionType": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "SPECIFIC_VERSION",
+                        "enum": [
+                            "LATEST_MAJOR",
+                            "LATEST_MINOR",
+                            "LATEST_ANY",
+                            "SPECIFIC_VERSION",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "specificVersion": {
+                        "minLength": 0,
+                        "type": "string",
+                        "description": "Optional. Indicates the specific version to update to. Only available when the version type is set to specific version, otherwise defaults to NO_SPECIFIC_VERSION.",
+                        "example": "12.6.1",
+                        "default": "NO_SPECIFIC_VERSION"
+                    },
+                    "maxDeferrals": {
+                        "minimum": 0,
+                        "type": "integer",
+                        "description": "Required when the provided updateAction is DOWNLOAD_INSTALL_ALLOW_DEFERRAL, not applicable to all managed software update plans",
+                        "example": 5
+                    },
+                    "forceInstallLocalDateTime": {
+                        "type": "string",
+                        "description": "Optional. Indicates the local date and time of the device to force update by.",
+                        "nullable": true,
+                        "example": "2023-12-25T21:09:31"
+                    }
+                },
+                "nullable": false
+            },
+            "PlanDevice": {
+                "type": "object",
+                "properties": {
+                    "deviceId": {
+                        "minLength": 1,
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "1"
+                    },
+                    "objectType": {
+                        "type": "string",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": "COMPUTER",
+                        "enum": [
+                            "COMPUTER",
+                            "MOBILE_DEVICE",
+                            "APPLE_TV"
+                        ]
+                    },
+                    "href": {
+                        "type": "string",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": "/v1/computers-inventory/1"
+                    }
+                }
+            },
+            "PlanDevicePost": {
+                "required": [
+                    "deviceId",
+                    "objectType"
+                ],
+                "type": "object",
+                "properties": {
+                    "deviceId": {
+                        "minLength": 1,
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "objectType": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "COMPUTER",
+                        "enum": [
+                            "COMPUTER",
+                            "MOBILE_DEVICE",
+                            "APPLE_TV"
+                        ]
+                    }
+                }
+            },
+            "PlanDeviceResponse": {
+                "type": "object",
+                "properties": {
+                    "device": {
+                        "$ref": "#/components/schemas/PlanDevice"
+                    },
+                    "planId": {
+                        "minLength": 1,
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "6E47EF55-5318-494F-A09E-70F613E0AFD1"
+                    },
+                    "href": {
+                        "type": "string",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": "/v1/managed-software-updates/plans/6E47EF55-5318-494F-A09E-70F613E0AFD1"
+                    }
+                }
+            },
+            "PlanGroupPost": {
+                "required": [
+                    "groupId",
+                    "objectType"
+                ],
+                "type": "object",
+                "properties": {
+                    "groupId": {
+                        "minLength": 1,
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "objectType": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "COMPUTER_GROUP",
+                        "enum": [
+                            "COMPUTER_GROUP",
+                            "MOBILE_DEVICE_GROUP"
+                        ]
+                    }
+                },
+                "nullable": false
+            },
             "PlanSearchResults": {
                 "type": "object",
                 "properties": {
@@ -42067,6 +43586,79 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/JamfProtectPlan"
+                        }
+                    }
+                }
+            },
+            "PlanStatus": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": "SchedulingScanForOSUpdates",
+                        "enum": [
+                            "Init",
+                            "PendingPlanValidation",
+                            "AcceptingPlan",
+                            "RejectingPlan",
+                            "ProcessingPlanType",
+                            "StartingPlan",
+                            "PlanFailed",
+                            "SchedulingScanForOSUpdates",
+                            "ProcessingScheduleOSUpdateScanResponse",
+                            "WaitingForScheduledOSUpdateScanToComplete",
+                            "CollectingAvailableOSUpdates",
+                            "ProcessingAvailableOSUpdatesResponse",
+                            "ProcessingSchedulingType",
+                            "SchedulingDDM",
+                            "DDMPlanScheduled",
+                            "WaitingToStartDDMUpdate",
+                            "ProcessingDDMStatusResponse",
+                            "CollectingDDMStatus",
+                            "SchedulingMDM",
+                            "MDMPlanScheduled",
+                            "SchedulingOSUpdate",
+                            "ProcessingScheduleOSUpdateResponse",
+                            "CollectingOSUpdateStatus",
+                            "ProcessingOSUpdateStatusResponse",
+                            "WaitingToCollectOSUpdateStatus",
+                            "VerifyingInstallation",
+                            "ProcessingInstallationVerification",
+                            "PlanCompleted",
+                            "PlanCanceled",
+                            "PlanException",
+                            "Unknown"
+                        ]
+                    },
+                    "errorReasons": {
+                        "type": "array",
+                        "nullable": true,
+                        "readOnly": true,
+                        "example": [
+                            "NO_UPDATES_AVAILABLE",
+                            "NOT_SUPERVISED"
+                        ],
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "APPLE_SILICON_NO_ESCROW_KEY",
+                                "NOT_SUPERVISED",
+                                "NOT_MANAGED",
+                                "NO_DISK_SPACE",
+                                "NO_UPDATES_AVAILABLE",
+                                "SPECIFIC_VERSION_UNAVAILABLE",
+                                "ACTION_NOT_SUPPORTED_FOR_DEVICE_TYPE",
+                                "DECLARATIVE_DEVICE_MANAGEMENT_SOFTWARE_UPDATES_NOT_SUPPORTED_FOR_DEVICE_OS_VERSION",
+                                "DECLARATIVE_DEVICE_MANAGEMENT_SOFTWARE_UPDATES_NOT_SUPPORTED_FOR_DEVICE_TYPE",
+                                "PLAN_NOT_FOUND",
+                                "APPLE_SOFTWARE_LOOKUP_SERVICE_ERROR",
+                                "EXISTING_PLAN_FOR_DEVICE_IN_PROGRESS",
+                                "DOWNGRADE_NOT_SUPPORTED",
+                                "DECLARATIVE_SERVICE_ERROR",
+                                "UNKNOWN"
+                            ]
                         }
                     }
                 }
@@ -42995,6 +44587,77 @@
                     }
                 }
             },
+            "SchedulerJob": {
+                "type": "object",
+                "properties": {
+                    "totalCount": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SchedulerTrigger"
+                        }
+                    }
+                },
+                "readOnly": true
+            },
+            "SchedulerJobs": {
+                "type": "object",
+                "properties": {
+                    "jobKeys": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "EXAMPLE_JOB"
+                        }
+                    }
+                },
+                "readOnly": true
+            },
+            "SchedulerSummary": {
+                "type": "object",
+                "properties": {
+                    "numberOfPendingJobs": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "numberOfExecutingJobs": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "numberOfExecutedJobs": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "started": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "readOnly": true
+            },
+            "SchedulerTrigger": {
+                "type": "object",
+                "properties": {
+                    "triggerKey": {
+                        "type": "string",
+                        "example": "EXAMPLE_TRIGGER"
+                    },
+                    "previousFireTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-08-21T21:20:34.35Z"
+                    },
+                    "nextFireTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-08-21T21:30:34.35Z"
+                    }
+                },
+                "readOnly": true
+            },
             "Script": {
                 "required": [
                     "name"
@@ -43216,13 +44879,13 @@
                         "type": "string",
                         "description": "the default landing page in Self Service\n",
                         "example": "HOME",
+                        "default": "HOME",
                         "enum": [
                             "HOME",
                             "BROWSE",
                             "HISTORY",
                             "NOTIFICATIONS"
-                        ],
-                        "default": "HOME"
+                        ]
                     },
                     "defaultHomeCategoryId": {
                         "type": "integer",
@@ -43418,6 +45081,60 @@
                 },
                 "description": "Sessions search result"
             },
+            "SessionHistoryItem": {
+                "type": "object",
+                "properties": {
+                    "tenantId": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "ee5d0ffae49e675d32ba5bdb2ce25182e958b979afc8d210c924d725bbf45f8b"
+                    },
+                    "sessionId": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "c4087bc8-cb48-4452-9bec-a3c50088a485"
+                    },
+                    "deviceId": {
+                        "type": "string",
+                        "example": "aeafd2ff95c7e0b937a8dbf3121a8dcab7a70161cd4493af038fa9c784b61866"
+                    },
+                    "sessionStartedTimestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-11-07T10:25:27.49Z"
+                    },
+                    "sessionEndedTimestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-11-07T10:25:27.49Z"
+                    },
+                    "sessionType": {
+                        "type": "string",
+                        "example": "ATTENDED",
+                        "enum": [
+                            "ATTENDED",
+                            "UNATTENDED"
+                        ]
+                    },
+                    "statusType": {
+                        "type": "string",
+                        "example": "STARTED",
+                        "enum": [
+                            "STARTED",
+                            "FINISHED",
+                            "ERROR"
+                        ]
+                    },
+                    "sessionAdminId": {
+                        "type": "string",
+                        "example": "sessionAdminId1"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "example": "Example comment"
+                    }
+                }
+            },
             "SessionStatus": {
                 "type": "object",
                 "properties": {
@@ -43601,6 +45318,93 @@
                     "closingParen": {
                         "type": "boolean",
                         "example": false
+                    }
+                }
+            },
+            "SmtpServer": {
+                "required": [
+                    "connectionTimeout",
+                    "enabled",
+                    "encryptionType",
+                    "port",
+                    "requiresAuthentication",
+                    "senderDisplayName",
+                    "senderEmailAddress",
+                    "server"
+                ],
+                "type": "object",
+                "properties": {
+                    "enabled": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": false
+                    },
+                    "server": {
+                        "type": "string",
+                        "example": "abcd.server.com",
+                        "default": ""
+                    },
+                    "port": {
+                        "type": "integer",
+                        "example": 25,
+                        "default": 25
+                    },
+                    "encryptionType": {
+                        "type": "string",
+                        "example": "SSL",
+                        "default": "NONE",
+                        "enum": [
+                            "NONE",
+                            "SSL",
+                            "TLS_1_2",
+                            "TLS_1_1",
+                            "TLS_1"
+                        ]
+                    },
+                    "connectionTimeout": {
+                        "type": "integer",
+                        "example": 5,
+                        "default": 5
+                    },
+                    "senderDisplayName": {
+                        "type": "string",
+                        "example": "Jamf Pro Server",
+                        "default": "Jamf Pro Server"
+                    },
+                    "senderEmailAddress": {
+                        "type": "string",
+                        "example": "exampleEmail@example.com",
+                        "default": ""
+                    },
+                    "requiresAuthentication": {
+                        "type": "boolean",
+                        "example": true,
+                        "default": false
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "exampleEmail@example.com",
+                        "default": ""
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "writeOnly": true,
+                        "example": "examplePassword",
+                        "default": ""
+                    }
+                }
+            },
+            "SmtpServerTest": {
+                "required": [
+                    "recipientEmail"
+                ],
+                "type": "object",
+                "properties": {
+                    "recipientEmail": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "exampleEmail@example.com"
                     }
                 }
             },
@@ -43869,7 +45673,7 @@
                     }
                 }
             },
-            "SsoSettings": {
+            "SsoSettingsV1": {
                 "required": [
                     "enrollmentSsoForAdueEnabled",
                     "entityId",
@@ -43964,7 +45768,138 @@
                     },
                     "idpUrl": {
                         "type": "string",
-                        "example": "https://dev-940210.oktapreview.com/app/exk6bnecb9a4Z5spn0h7/sso/saml/metadata"
+                        "example": "https://example.idp.com/app/id/sso/saml/metadata"
+                    },
+                    "entityId": {
+                        "type": "string",
+                        "example": "saml/metadata"
+                    },
+                    "metadataFileName": {
+                        "type": "string",
+                        "example": "if MetadataSource is set to URL, remove this field"
+                    },
+                    "otherProviderTypeName": {
+                        "type": "string",
+                        "default": " "
+                    },
+                    "federationMetadataFile": {
+                        "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+                        "type": "string",
+                        "format": "byte",
+                        "example": "WlhoaGJYQnNaU0J2WmlCaElHSmhjMlUyTkNCbGJtTnZaR1ZrSUhaaGJHbGtJSEF4TWk0Z2EyVjVjM1J2Y21VZ1ptbHNaUT09"
+                    },
+                    "metadataSource": {
+                        "type": "string",
+                        "example": "URL",
+                        "enum": [
+                            "URL",
+                            "FILE",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "sessionTimeout": {
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 480
+                    }
+                }
+            },
+            "SsoSettingsV2": {
+                "required": [
+                    "enrollmentSsoForAccountDrivenEnrollmentEnabled",
+                    "entityId",
+                    "groupAttributeName",
+                    "groupEnrollmentAccessEnabled",
+                    "groupRdnKey",
+                    "idpProviderType",
+                    "metadataSource",
+                    "ssoBypassAllowed",
+                    "ssoEnabled",
+                    "ssoForEnrollmentEnabled",
+                    "ssoForMacOsSelfServiceEnabled",
+                    "tokenExpirationDisabled",
+                    "userAttributeEnabled",
+                    "userMapping"
+                ],
+                "type": "object",
+                "properties": {
+                    "ssoForEnrollmentEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "ssoBypassAllowed": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "ssoEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "ssoForMacOsSelfServiceEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "tokenExpirationDisabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "userAttributeEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "userAttributeName": {
+                        "type": "string",
+                        "default": " "
+                    },
+                    "userMapping": {
+                        "type": "string",
+                        "example": "USERNAME",
+                        "enum": [
+                            "USERNAME",
+                            "EMAIL"
+                        ]
+                    },
+                    "enrollmentSsoForAccountDrivenEnrollmentEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "enrollmentSsoConfig": {
+                        "$ref": "#/components/schemas/EnrollmentSsoConfig"
+                    },
+                    "groupEnrollmentAccessEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "groupAttributeName": {
+                        "type": "string",
+                        "default": "http://schemas.xmlsoap.org/claims/Group"
+                    },
+                    "groupRdnKey": {
+                        "type": "string",
+                        "default": " "
+                    },
+                    "groupEnrollmentAccessName": {
+                        "type": "string",
+                        "default": " "
+                    },
+                    "idpProviderType": {
+                        "type": "string",
+                        "example": "ADFS",
+                        "enum": [
+                            "ADFS",
+                            "OKTA",
+                            "GOOGLE",
+                            "SHIBBOLETH",
+                            "ONELOGIN",
+                            "PING",
+                            "CENTRIFY",
+                            "AZURE",
+                            "OTHER"
+                        ]
+                    },
+                    "idpUrl": {
+                        "type": "string",
+                        "example": "https://example.idp.com/app/id/sso/saml/metadata"
                     },
                     "entityId": {
                         "type": "string",
