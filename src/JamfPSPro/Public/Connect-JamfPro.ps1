@@ -7,6 +7,8 @@
         Specify the JamfPro 'server'
     .PARAMETER Credential
         Specify the credentails
+    .PARAMETER NoWelcome
+        Prevents the connection information being displayed
     .PARAMETER Force
         Force reconnection to API ignoring 'valid' token
     .EXAMPLE
@@ -32,7 +34,10 @@ function Connect-JamfPro {
         $Credential = [System.Management.Automation.PSCredential]::Empty,
 
         [Parameter(Mandatory = $false)]
-        [switch]$Force
+        [switch]$Force,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$NoWelcome
     )
 
     BEGIN {
@@ -103,14 +108,16 @@ function Connect-JamfPro {
                 break
             }
 
-            $ConnectionDetails = [PSCustomObject][Ordered]@{
-                Account = $VerifyAuth.account.username
-                Access  = $VerifyAuth.account.accessLevel
-                Server  = $Server
-                Build   = $JamfBuild
-                Expires = $TokenJamfPSPro.expires
+            if ( -not $NoWelcome ) {
+                $ConnectionDetails = [PSCustomObject][Ordered]@{
+                    Account = $VerifyAuth.account.username
+                    Access  = $VerifyAuth.account.accessLevel
+                    Server  = $Server
+                    Build   = $JamfBuild
+                    Expires = $TokenJamfPSPro.expires
+                }
+                $ConnectionDetails | Format-Table
             }
-            $ConnectionDetails | Format-Table
 
         } elseif ( $TokenJamfPSPro.token -and ( (Get-Date $TokenJamfPSPro.expires) -le ((Get-Date).AddMinutes(20)) ) ) {
             Write-Debug "Found token with healthy expiry. Expires: $($TokenJamfPSPro.expires)"
