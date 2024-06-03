@@ -39,7 +39,7 @@ function Set-Jamf {
         [Parameter(
             Position = 0,
             Mandatory)]
-        [ValidateSet('accounts','activationcode','adue-session-token-settings','advanced-mobile-device-searches','advanced-user-content-searches','advancedcomputersearches','advancedmobiledevicesearches','advancedusersearches','api-integrations','api-roles','app-request','buildings','byoprofiles','cache-settings','categories','check-in','classes','cloud-azure','cloud-ldaps','computer-prestages','computercheckin','computerextensionattributes','computergroups','computerinventorycollection','computers','csa','departments','device-communication-settings','device-enrollments','directorybindings','diskencryptionconfigurations','distributionpoints','dockitems','ebooks','engage','enrollment','enrollment-customization','enrollment-customizations','gsxconnection','healthcarelistener','healthcarelistenerrule','ibeacons','infrastructuremanager','inventory-preload','jamf-connect','jamf-pro-server-url','jamf-protect','jsonwebtokenconfigurations','ldapservers','licensedsoftware','local-admin-password','macapplications','managedpreferenceprofiles','mobile-device-prestages','mobiledeviceapplications','mobiledeviceconfigurationprofiles','mobiledeviceenrollmentprofiles','mobiledeviceextensionattributes','mobiledevicegroups','mobiledeviceprovisioningprofiles','mobiledevices','networksegments','obj','osxconfigurationprofiles','packages','parent-app','patches','patchexternalsources','patchpolicies','patchsoftwaretitles','peripherals','peripheraltypes','policies','policy-properties','printers','reenrollment','removablemacaddresses','restrictedsoftware','scripts','self-service','sites','smtpserver','softwareupdateservers','sso','supervision-identities','teacher-app','user','userextensionattributes','usergroups','users','volume-purchasing-subscriptions','vppaccounts','vppassignments','vppinvitations','webhooks')]
+        [ValidateSet('accounts','activationcode','advancedcomputersearches','advancedmobiledevicesearches','advancedusersearches','buildings','byoprofiles','categories','classes','computercheckin','computerextensionattributes','computergroups','computerinventorycollection','computers','departments','directorybindings','diskencryptionconfigurations','distributionpoints','dockitems','ebooks','gsxconnection','healthcarelistener','healthcarelistenerrule','ibeacons','infrastructuremanager','jsonwebtokenconfigurations','ldapservers','licensedsoftware','macapplications','mobiledeviceapplications','mobiledeviceconfigurationprofiles','mobiledeviceenrollmentprofiles','mobiledeviceextensionattributes','mobiledevicegroups','mobiledeviceprovisioningprofiles','mobiledevices','networksegments','osxconfigurationprofiles','packages','patches','patchexternalsources','patchpolicies','patchsoftwaretitles','peripherals','peripheraltypes','policies','printers','removablemacaddresses','restrictedsoftware','scripts','sites','smtpserver','softwareupdateservers','userextensionattributes','usergroups','users','vppaccounts','vppassignments','vppinvitations','webhooks','obj','activation-code','adue-session-token-settings','advanced-mobile-device-searches','advanced-user-content-searches','api-integrations','api-roles','app-request','cache-settings','cloud-azure','computer-prestages','device-communication-settings','device-enrollments','dock-items','engage','enrollment-customization','gsx-connection','inventory-preload','jamf-connect','jamf-pro-server-url','jamf-protect','local-admin-password','login-customization','managed-software-updates','mobile-device-prestages','onboarding','parent-app','policy-properties','reenrollment','return-to-service','self-service','smtp-server','sso','supervision-identities','teacher-app','user','volume-purchasing-subscriptions','cloud-ldaps','enrollment','enrollment-customizations','check-in')]
         [ValidateNotNullOrEmpty()]
         [String]$Component,
 
@@ -69,7 +69,12 @@ function Set-Jamf {
 
         $Path = $ValidOptions | Where-Object {$_.Option -eq $PSBoundParameters.Select}
         $ReplaceMatches = $Path.URL | Select-String -Pattern '{.*?}' -AllMatches
-        $replacementCounter = 0
+        $MatchType = switch ($true) {
+            { ($ReplaceMatches.Matches.Count -eq $Params.Count) -and ($Params.Count) -eq 1}                  { "1-1" }
+            { ($ReplaceMatches.Matches.Count -eq 1) -and ($Params.Count -gt 1) }                             { "1-Many" }
+            { ($ReplaceMatches.Matches.Count -eq $Params.Count) -and ($Params.Count) -gt 1}                  { "Many-Many" }
+            { ($ReplaceMatches.Matches.Count -gt 1) -and ($Params.Count -gt $ReplaceMatches.Matches.Count) } { "Many-More" }
+        }
     }
 
     PROCESS {
@@ -102,48 +107,37 @@ function Set-Jamf {
             }
         }
 
-        if ( $ReplaceMatches.count -gt 1 ) {
-
-            Write-Debug "Multi param path"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
-            foreach ( $replace in $ReplaceMatches.Matches.value ) {
-                $RestURL = $Path.URL -replace $replace, $Params[$replacementCounter]
-                $replacementCounter++
+        if ( $MatchType -match '1-1|Many-Many' ) {
+            Write-Debug "1-1|Many-Many"
+            foreach ( $Replacement in $ReplaceMatches.Matches.value ) {
+                Write-Debug "Path: $RestURL"
+                $MatchIndex = [array]::IndexOf($ReplaceMatches.Matches.value, $Replacement)
+                $RestURL = $RestURL -replace $Replacement, $Params[$MatchIndex]
             }
-            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-            if ($PSCmdlet.ShouldProcess("$RestURL",'Create')){
-                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'put' -Body $Content -AppType $AppType
-                if ( $Result.IsSuccessStatusCode -eq $true) {
-                    return [pscustomobject]@{
-                        Action  = 'Set'
-                        Path    = $RestURL
-                        Content = $Content
-                        Result  = $Result
-                    }
-                } else {
-                    Write-Error (Get-ErrorMessage $Result)
-                }
+        } elseif ( $MatchType -match '1-Many|Many-More' ) {
+            Write-Debug "1-Many|Many-More"
+            for ( ($i = 0); $i -lt ($ReplaceMatches.Matches.Count - 1); $i++ ) {
+                Write-Debug "Path: $RestURL"
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, $Params[$i]
             }
-        } elseif ( $Params.count -gt 1 ) {
+            if ( $ReplaceMatches.Matches[$i].value -match 'list' ) {
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, ($Params[$i..($Params.count)] -join ',')
+                Write-Debug "Path: $RestURL"
+            } else {
+                $CustomList = $true
+            }
+        }
 
-            Write-Debug "Multi params"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
+        if ( $CustomList ) {
             $Results = New-Object System.Collections.Generic.List[System.Object]
-            foreach ( $Param in $Params ) {
-                $RestURL = $Path.URL -replace '{.*?}', $Param
+            foreach ( $Param in $Params[$i..($Params.count)] ) {
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-
-                if ($PSCmdlet.ShouldProcess("$RestURL",'Create')){
+                if ($PSCmdlet.ShouldProcess("$Component",'Create')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'put' -Body $Content -AppType $AppType
-                    if ( $Result.IsSuccessStatusCode -eq $true) {
-                        $Results.Add(
-                            [pscustomobject]@{
+                    if ( $Result.IsSuccessStatusCode -eq $true ) {
+                        $Results.Add([pscustomobject]@{
                                 Action  = 'Set'
                                 Path    = $RestURL
                                 Content = $Content
@@ -154,21 +148,14 @@ function Set-Jamf {
                         Write-Error (Get-ErrorMessage $Result)
                     }
                 }
-
             }
             return $Results
         } else {
-
-            Write-Debug "Single param"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
-            $RestURL = $Path.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-            if ($PSCmdlet.ShouldProcess("$RestURL",'Create')){
+            if ($PSCmdlet.ShouldProcess("$Component",'Create')){
                 $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'put' -Body $Content -AppType $AppType
-                if ( $Result.IsSuccessStatusCode -eq $true) {
+                if ( $Result.IsSuccessStatusCode -eq $true ) {
                     return [pscustomobject]@{
                         Action  = 'Set'
                         Path    = $RestURL
@@ -180,5 +167,6 @@ function Set-Jamf {
                 }
             }
         }
+
     }
 }

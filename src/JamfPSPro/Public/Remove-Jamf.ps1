@@ -28,7 +28,7 @@ function Remove-Jamf {
         [Parameter(
             Position = 0,
             Mandatory)]
-        [ValidateSet('accounts','advanced-mobile-device-searches','advanced-user-content-searches','advancedcomputersearches','advancedmobiledevicesearches','advancedusersearches','alerts','allowedfileextensions','api-integrations','api-roles','app-request','buildings','categories','classes','cloud-azure','cloud-ldaps','commandflush','computer-inventory-collection-settings','computer-prestages','computerextensionattributes','computergroups','computerinvitations','computers-inventory','computers','csa','departments','device-enrollments','directorybindings','diskencryptionconfigurations','distributionpoints','dockitems','ebooks','enrollment-customization','enrollment-customizations','enrollment','ibeacons','inventory-preload','jamf-protect','jsonwebtokenconfigurations','ldapservers','licensedsoftware','logflush','macapplications','managedpreferenceprofiles','mobile-device-groups','mobile-device-prestages','mobiledeviceapplications','mobiledeviceconfigurationprofiles','mobiledeviceenrollmentprofiles','mobiledeviceextensionattributes','mobiledevicegroups','mobiledeviceinvitations','mobiledeviceprovisioningprofiles','mobiledevices','networksegments','notifications','obj','osxconfigurationprofiles','packages','patch-policies','patch-software-title-configurations','patches','patchpolicies','patchsoftwaretitles','peripherals','peripheraltypes','pki','policies','printers','remote-administration-configurations','removablemacaddresses','restrictedsoftware','scripts','self-service','sites','softwareupdateservers','sso','supervision-identities','user','userextensionattributes','usergroups','users','volume-purchasing-locations','volume-purchasing-subscriptions','vppaccounts','vppassignments','vppinvitations','webhooks')]
+        [ValidateSet('accounts','advancedcomputersearches','advancedmobiledevicesearches','advancedusersearches','allowedfileextensions','buildings','categories','classes','commandflush','computerextensionattributes','computergroups','computerinvitations','computers','departments','directorybindings','diskencryptionconfigurations','distributionpoints','dockitems','ebooks','ibeacons','jsonwebtokenconfigurations','ldapservers','licensedsoftware','logflush','macapplications','mobiledeviceapplications','mobiledeviceconfigurationprofiles','mobiledeviceenrollmentprofiles','mobiledeviceextensionattributes','mobiledevicegroups','mobiledeviceinvitations','mobiledeviceprovisioningprofiles','mobiledevices','networksegments','osxconfigurationprofiles','packages','patches','patchpolicies','patchsoftwaretitles','peripherals','peripheraltypes','policies','printers','removablemacaddresses','restrictedsoftware','scripts','sites','softwareupdateservers','userextensionattributes','usergroups','users','vppaccounts','vppassignments','vppinvitations','webhooks','{id}','alerts','remote-administration-configurations','obj','advanced-mobile-device-searches','advanced-user-content-searches','api-integrations','api-roles','app-request','cloud-azure','computer-inventory-collection-settings','computer-prestages','computers-inventory','csa','device-enrollments','dock-items','enrollment-customization','inventory-preload','jamf-protect','jcds','mobile-device-groups','mobile-device-prestages','notifications','pki','return-to-service','self-service','sso','supervision-identities','user','volume-purchasing-locations','volume-purchasing-subscriptions','cloud-ldaps','enrollment-customizations','enrollment','patch-policies','patch-software-title-configurations')]
         [ValidateNotNullOrEmpty()]
         [String]$Component,
 
@@ -52,51 +52,47 @@ function Remove-Jamf {
 
         $Path = $ValidOptions | Where-Object {$_.Option -eq $PSBoundParameters.Select}
         $ReplaceMatches = $Path.URL | Select-String -Pattern '{.*?}' -AllMatches
-        $replacementCounter = 0
+        $MatchType = switch ($true) {
+            { ($ReplaceMatches.Matches.Count -eq $Params.Count) -and ($Params.Count) -eq 1}                  { "1-1" }
+            { ($ReplaceMatches.Matches.Count -eq 1) -and ($Params.Count -gt 1) }                             { "1-Many" }
+            { ($ReplaceMatches.Matches.Count -eq $Params.Count) -and ($Params.Count) -gt 1}                  { "Many-Many" }
+            { ($ReplaceMatches.Matches.Count -gt 1) -and ($Params.Count -gt $ReplaceMatches.Matches.Count) } { "Many-More" }
+        }
     }
 
     PROCESS {
-        if ( $ReplaceMatches.count -gt 1 ) {
 
-            Write-Debug "Multi param path"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
-            foreach ( $replace in $ReplaceMatches.Matches.value ) {
-                $RestURL = $Path.URL -replace $replace, $Params[$replacementCounter]
-                $replacementCounter++
+        if ( $MatchType -match '1-1|Many-Many' ) {
+            Write-Debug "1-1|Many-Many"
+            foreach ( $Replacement in $ReplaceMatches.Matches.value ) {
+                Write-Debug "Path: $RestURL"
+                $MatchIndex = [array]::IndexOf($ReplaceMatches.Matches.value, $Replacement)
+                $RestURL = $RestURL -replace $Replacement, $Params[$MatchIndex]
             }
-            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-
-            if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
-                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
-                if ( $Result.IsSuccessStatusCode -eq $true ) {
-                    return [pscustomobject]@{
-                        Action = 'Removed'
-                        Path   = $RestURL
-                    }
-                } else {
-                    Write-Error (Get-ErrorMessage $Result)
-                }
+        } elseif ( $MatchType -match '1-Many|Many-More' ) {
+            Write-Debug "1-Many|Many-More"
+            for ( ($i = 0); $i -lt ($ReplaceMatches.Matches.Count - 1); $i++ ) {
+                Write-Debug "Path: $RestURL"
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, $Params[$i]
             }
-        } elseif ( $Params.count -gt 1 ) {
+            if ( $ReplaceMatches.Matches[$i].value -match 'list' ) {
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, ($Params[$i..($Params.count)] -join ',')
+                Write-Debug "Path: $RestURL"
+            } else {
+                $CustomList = $true
+            }
+        }
 
-            Write-Debug "Multi params"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
+        if ( $CustomList ) {
             $Results = New-Object System.Collections.Generic.List[System.Object]
-            foreach ( $Param in $Params ) {
-                $RestURL = $Path.URL -replace '{.*?}', $Param
+            foreach ( $Param in $Params[$i..($Params.count)] ) {
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-
-                if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
+                if ($PSCmdlet.ShouldProcess("$Component",'Delete')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
-                    if ( $Result.IsSuccessStatusCode -eq $true) {
-                        $Results.Add(
-                            [pscustomobject]@{
+                    if ( $Result.IsSuccessStatusCode -eq $true ) {
+                        $Results.Add([pscustomobject]@{
                                 Action = 'Removed'
                                 Path   = $RestURL
                             }
@@ -105,30 +101,23 @@ function Remove-Jamf {
                         Write-Error (Get-ErrorMessage $Result)
                     }
                 }
-
             }
             return $Results
         } else {
-
-            Write-Debug "Single param"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
-            $RestURL = $Path.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-            if ($PSCmdlet.ShouldProcess("$RestURL",'Delete')){
-                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'delete'
+            if ($PSCmdlet.ShouldProcess("$Component",'Delete')){
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post'
                 if ( $Result.IsSuccessStatusCode -eq $true ) {
                     return [pscustomobject]@{
                         Action = 'Removed'
                         Path   = $RestURL
                     }
                 } else {
-                    Write-Debug "IsSuccessStatusCode: $false"
                     Write-Error (Get-ErrorMessage $Result)
                 }
             }
         }
+
     }
 }

@@ -36,7 +36,7 @@ function Get-Jamf {
         [Parameter(
             Position = 0,
             Mandatory)]
-        [ValidateSet('accounts','activationcode','admin-accounts','adue-session-token-settings','advanced-mobile-device-searches','advanced-user-content-searches','advancedcomputersearches','advancedmobiledevicesearches','advancedusersearches','alerts','allowedfileextensions','api-integrations','api-role-privileges','api-roles','app-request','app-store-country-codes','auth','azure-ad-migration','branding-images','buildings','byoprofiles','cache-settings','categories','check-in','classes','classic-ldap','cloud-azure','cloud-idp','cloud-information','cloud-ldaps','computer-groups','computer-inventory-collection-settings','computer-prestages','computerapplications','computerapplicationusage','computercheckin','computercommands','computerextensionattributes','computergroups','computerhardwaresoftwarereports','computerhistory','computerinventorycollection','computerinvitations','computermanagement','computerreports','computers','computers-inventory','computers-inventory-detail','conditional-access','csa','csv-template','dashboard','departments','device-communication-settings','device-enrollments','directorybindings','diskencryptionconfigurations','distributionpoints','dockitems','ebooks','engage','enrollment','enrollment-customization','enrollment-customizations','extensionAttributes','groups','gsxconnection','healthcarelistener','healthcarelistenerrule','history','ibeacons','icon','infrastructuremanager','inventory-information','inventory-preload','jamf-connect','jamf-package','jamf-pro-information','jamf-pro-server-url','jamf-pro-version','jamf-protect','jsonwebtokenconfigurations','jssuser','ldap','ldapservers','licensedsoftware','local-admin-password','locales','macapplications','macos-managed-software-updates','managed-software-updates','managedpreferenceprofiles','mdm','mobile-device-enrollment-profile','mobile-device-groups','mobile-device-prestages','mobile-devices','mobiledeviceapplications','mobiledevicecommands','mobiledeviceconfigurationprofiles','mobiledeviceenrollmentprofiles','mobiledeviceextensionattributes','mobiledevicegroups','mobiledevicehistory','mobiledeviceinvitations','mobiledeviceprovisioningprofiles','mobiledevices','networksegments','notifications','obj','osxconfigurationprofiles','packages','parent-app','patch-policies','patch-software-title-configurations','patchavailabletitles','patches','patchexternalsources','patchinternalsources','patchpolicies','patchreports','patchsoftwaretitles','peripherals','peripheraltypes','pki','policies','policy-properties','printers','reenrollment','remote-administration-configurations','removablemacaddresses','restrictedsoftware','savedsearches','scripts','self-service','servers','sites','smtpserver','softwareupdateservers','sso','static-user-groups','subscriptions','supervision-identities','teacher-app','time-zones','user','userextensionattributes','usergroups','users','volume-purchasing-locations','volume-purchasing-subscriptions','vppaccounts','vppassignments','vppinvitations','webhooks')]
+        [ValidateSet('accounts','activationcode','advancedcomputersearches','advancedmobiledevicesearches','advancedusersearches','allowedfileextensions','buildings','byoprofiles','categories','classes','computerapplications','computerapplicationusage','computercheckin','computercommands','computerextensionattributes','computergroups','computerhardwaresoftwarereports','computerhistory','computerinventorycollection','computerinvitations','computermanagement','computerreports','computers','departments','directorybindings','diskencryptionconfigurations','distributionpoints','dockitems','ebooks','gsxconnection','healthcarelistener','healthcarelistenerrule','ibeacons','infrastructuremanager','jsonwebtokenconfigurations','jssuser','ldapservers','licensedsoftware','macapplications','mobiledeviceapplications','mobiledevicecommands','mobiledeviceconfigurationprofiles','mobiledeviceenrollmentprofiles','mobiledeviceextensionattributes','mobiledevicegroups','mobiledevicehistory','mobiledeviceinvitations','mobiledeviceprovisioningprofiles','mobiledevices','networksegments','osxconfigurationprofiles','packages','patchavailabletitles','patches','patchexternalsources','patchinternalsources','patchpolicies','patchreports','patchsoftwaretitles','peripherals','peripheraltypes','policies','printers','removablemacaddresses','restrictedsoftware','savedsearches','scripts','sites','smtpserver','softwareupdateservers','userextensionattributes','usergroups','users','vppaccounts','vppassignments','vppinvitations','webhooks','extensionAttributes','csv-template','history','groups','servers','alerts','remote-administration-configurations','obj','adue-session-token-settings','advanced-mobile-device-searches','advanced-user-content-searches','api-integrations','api-role-privileges','api-roles','app-request','app-store-country-codes','auth','branding-images','cache-settings','classic-ldap','cloud-azure','cloud-distribution-point','cloud-idp','cloud-information','computer-groups','computer-inventory-collection-settings','computer-prestages','computers-inventory','computers-inventory-detail','conditional-access','csa','dashboard','device-communication-settings','device-enrollments','dock-items','engage','enrollment-customization','gsx-connection','health-check','icon','inventory-information','inventory-preload','jamf-connect','jamf-package','jamf-pro-information','jamf-pro-server-url','jamf-pro-version','jamf-protect','jamf-remote-assist','jcds','ldap','local-admin-password','locales','login-customization','macos-managed-software-updates','managed-software-updates','mdm','mobile-device-enrollment-profile','mobile-device-groups','mobile-device-prestages','mobile-devices','notifications','onboarding','parent-app','pki','policy-properties','reenrollment','return-to-service','scheduler','self-service','smtp-server','sso','static-user-groups','supervision-identities','teacher-app','time-zones','user','volume-purchasing-locations','volume-purchasing-subscriptions','account-preferences','cloud-ldaps','enrollment','enrollment-customizations','patch-policies','patch-software-title-configurations','check-in')]
         [ValidateNotNullOrEmpty()]
         [String]$Component,
 
@@ -60,47 +60,44 @@ function Get-Jamf {
 
         $Path = $ValidOptions | Where-Object {$_.Option -eq $PSBoundParameters.Select}
         $ReplaceMatches = $Path.URL | Select-String -Pattern '{.*?}' -AllMatches
-        $ReplacementCounter = 0
+        $MatchType = switch ($true) {
+            { ($ReplaceMatches.Matches.Count -eq $Params.Count) -and ($Params.Count) -eq 1}                  { "1-1" }
+            { ($ReplaceMatches.Matches.Count -eq 1) -and ($Params.Count -gt 1) }                             { "1-Many" }
+            { ($ReplaceMatches.Matches.Count -eq $Params.Count) -and ($Params.Count) -gt 1}                  { "Many-Many" }
+            { ($ReplaceMatches.Matches.Count -gt 1) -and ($Params.Count -gt $ReplaceMatches.Matches.Count) } { "Many-More" }
+        }
     }
 
     PROCESS {
-        if ( $ReplaceMatches.Matches.count -gt 1 ) {
 
-            Write-Debug "Multi param path"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
-            foreach ( $replace in $ReplaceMatches.Matches.value ) {
-                if ( $ReplacementCounter -eq 0 ) {
-                    $RestURL = $Path.URL -replace $replace, $Params[$ReplacementCounter]
-                    $ReplacementCounter++
-                } else {
-                    $RestURL = $RestURL -replace $replace, $Params[$ReplacementCounter]
-                    $ReplacementCounter++
-                }
+        $RestURL = $Path.URL
+        if ( $MatchType -match '1-1|Many-Many' ) {
+            Write-Debug "1-1|Many-Many"
+            foreach ( $Replacement in $ReplaceMatches.Matches.value ) {
+                Write-Debug "Path: $RestURL"
+                $MatchIndex = [array]::IndexOf($ReplaceMatches.Matches.value, $Replacement)
+                $RestURL = $RestURL -replace $Replacement, $Params[$MatchIndex]
             }
-            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
-            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-            if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
-                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
-                if ( $Result.IsSuccessStatusCode -eq $true ) {
-                    return $Result | Select-Object * -ExcludeProperty IsSuccessStatusCode
-                } else {
-                    Write-Error (Get-ErrorMessage $Result)
-                }
+        } elseif ( $MatchType -match '1-Many|Many-More' ) {
+            Write-Debug "1-Many|Many-More"
+            for ( ($i = 0); $i -lt ($ReplaceMatches.Matches.Count - 1); $i++ ) {
+                Write-Debug "Path: $RestURL"
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, $Params[$i]
             }
-        } elseif ( $Params.count -gt 1 ) {
+            if ( $ReplaceMatches.Matches[$i].value -match 'list' ) {
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, ($Params[$i..($Params.count)] -join ',')
+                Write-Debug "Path: $RestURL"
+            } else {
+                $CustomList = $true
+            }
+        }
 
-            Write-Debug "Multi params"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
+        if ( $CustomList ) {
             $Results = New-Object System.Collections.Generic.List[System.Object]
-            foreach ( $Param in $Params ) {
-                $RestURL = $Path.URL -replace '{.*?}', $Param
+            foreach ( $Param in $Params[$i..($Params.count)] ) {
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, $Param
                 $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
                 $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
-
                 if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
                     $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'get'
                     if ( $Result.IsSuccessStatusCode -eq $true ) {
@@ -109,16 +106,9 @@ function Get-Jamf {
                         Write-Error (Get-ErrorMessage $Result)
                     }
                 }
-
             }
             return $Results
         } else {
-
-            Write-Debug "Single param"
-            Write-Debug "Path: $($Path.URL)"
-            Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
-
-            $RestURL = $Path.URL -replace '{.*?}', $Params
             $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
             $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
             if ($PSCmdlet.ShouldProcess("$RestURL",'Get')){
@@ -130,5 +120,6 @@ function Get-Jamf {
                 }
             }
         }
+
     }
 }
