@@ -5270,165 +5270,6 @@
                 "summary": "Finds mac applications by name"
             }
         },
-        "/managedpreferenceprofiles": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "No response was specified"
-                    }
-                },
-                "tags": [
-                    "managedpreferenceprofiles"
-                ],
-                "operationId": "findManagedPreferenceProfiles",
-                "summary": "Finds all managed preference profiles"
-            }
-        },
-        "/managedpreferenceprofiles/id/{id}": {
-            "delete": {
-                "parameters": [
-                    {
-                        "description": "Id value to filter by",
-                        "format": "int64",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No response was specified"
-                    }
-                },
-                "tags": [
-                    "managedpreferenceprofiles"
-                ],
-                "operationId": "deleteManagedPreferenceProfilesById",
-                "summary": "Deletes a managed preference profiles by id"
-            },
-            "get": {
-                "parameters": [
-                    {
-                        "description": "Id value to filter by",
-                        "format": "int64",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No response was specified"
-                    }
-                },
-                "tags": [
-                    "managedpreferenceprofiles"
-                ],
-                "operationId": "findManagedPreferenceProfilesById",
-                "summary": "Finds managed preference profiles by id"
-            },
-            "post": {
-                "parameters": [
-                    {
-                        "description": "Id value to filter by",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No response was specified"
-                    }
-                },
-                "tags": [
-                    "managedpreferenceprofiles"
-                ],
-                "operationId": "createManagedPreferenceProfileById",
-                "summary": "Creates a new managed preference profile by id"
-            },
-            "put": {
-                "parameters": [
-                    {
-                        "description": "Id value to filter by",
-                        "format": "int64",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No response was specified"
-                    }
-                },
-                "tags": [
-                    "managedpreferenceprofiles"
-                ],
-                "operationId": "updateManagedPreferenceProfilesById",
-                "summary": "Updates an existing managed preference profiles by id"
-            }
-        },
-        "/managedpreferenceprofiles/id/{id}/subset/{subset}": {
-            "get": {
-                "parameters": [
-                    {
-                        "description": "Id to filter by",
-                        "in": "path",
-                        "name": "id",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "default": "General",
-                        "description": "Subset to filter by",
-                        "in": "path",
-                        "name": "subset",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No response was specified"
-                    }
-                },
-                "tags": [
-                    "managedpreferenceprofiles"
-                ],
-                "description": "Displays information specified with the {subset} parameter for a profile specified with the {id} parameter. Name is also supported.  For example, /managedpreferenceprofiles/id/3/subset/General&Settings.",
-                "operationId": "findManagedPreferenceProfilesByIdSubset",
-                "summary": "Display subsets of information for a managed preference profile"
-            }
-        },
-        "/managedpreferenceprofiles/name/{name}": {
-            "get": {
-                "parameters": [
-                    {
-                        "description": "Name to filter by",
-                        "in": "path",
-                        "name": "name",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No response was specified"
-                    }
-                },
-                "tags": [
-                    "managedpreferenceprofiles"
-                ],
-                "description": "You can PUT, POST, and DELETE using this resource URL.",
-                "operationId": "findManagedPreferenceProfilesByName",
-                "summary": "Finds managed preference profiles by name"
-            }
-        },
         "/mobiledeviceapplications": {
             "get": {
                 "responses": {
@@ -11367,17 +11208,6 @@
                 }
             }
         },
-        "ManagedPreferenceProfiles": {
-            "properties": {
-                "id": {
-                    "format": "int64",
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "MobileDevice": {
             "properties": {
                 "id": {
@@ -11987,10 +11817,6 @@
         {
             "description": "Operations on macapplications",
             "name": "macapplications"
-        },
-        {
-            "description": "Operations on managedpreferenceprofiles",
-            "name": "managedpreferenceprofiles"
         },
         {
             "description": "Operations on mobiledeviceapplications",

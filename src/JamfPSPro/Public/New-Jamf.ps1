@@ -144,29 +144,31 @@ function New-Jamf {
             Write-Debug "Matches: $($ReplaceMatches.Matches.value)"
 
             $Results = New-Object System.Collections.Generic.List[System.Object]
+            $RestURL = $Path.URL
             foreach ( $Param in $Params ) {
-                $RestURL = $Path.URL -replace '{.*?}', $Param
-                $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
-                $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
+                $MatchIndex = [array]::IndexOf($Params, $Param)
+                $RestURL = $RestURL -replace $ReplaceMatches.Matches[$MatchIndex], $Param
+            }
 
-                if ($PSCmdlet.ShouldProcess("$Component",'Create')){
-                    $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content -AppType $AppType
-                    if ( $Result.IsSuccessStatusCode -eq $true) {
-                        $Results.Add(
-                            [pscustomobject]@{
-                                Action  = 'Created'
-                                Path    = $RestURL
-                                Content = $Content
-                                Result  = $Result
-                            }
-                        )
-                    } else {
-                        Write-Error (Get-ErrorMessage $Result)
-                    }
+            $BaseURL = 'https:/', $TokenJamfPSPro.Server, $Path.API -join '/'
+            $RestPath = 'https:/', $TokenJamfPSPro.Server, $Path.API, $RestURL -join '/'
+            if ($PSCmdlet.ShouldProcess("$Component",'Create')){
+                $Result = Invoke-JamfAPICall -Path $RestPath -BaseURL $BaseURL -Method 'post' -Body $Content -AppType $AppType
+                if ( $Result.IsSuccessStatusCode -eq $true) {
+                    $Results.Add(
+                        [pscustomobject]@{
+                            Action  = 'Created'
+                            Path    = $RestURL
+                            Content = $Content
+                            Result  = $Result
+                        }
+                    )
+                } else {
+                    Write-Error (Get-ErrorMessage $Result)
                 }
-
             }
             return $Results
+
         } else {
 
             Write-Debug "Single param"
