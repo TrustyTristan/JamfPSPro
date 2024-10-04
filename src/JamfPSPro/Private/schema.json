@@ -5735,6 +5735,448 @@
                 "x-authentication-required": false
             }
         },
+        "/v1/computer-extension-attributes": {
+            "get": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Retrieve Computer Extension Attributes.",
+                "description": "Retrieves All Computer Extension Attributes Configuration.",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorts results by one or more criteria, following the format property:asc/desc.<br/> Default sort is name:asc.<br/> If using multiple criteria, separate with commas. Allows sort for id and name.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "name.asc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc.<br/> Can be combined with paging and sorting.<br/> Fields allowed in the query: id, name <br/> Default filter is an empty query and returns all results from the requested page.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Computer Extension Attribute objects has been fetched successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ComputerExtensionAttributeSearchResults"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Computer Extension Attribute objects could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Computer Extension Attributes"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Create Computer Extension Attribute.",
+                "description": "Create Computer Extension Attribute to collect extra inventory information.",
+                "requestBody": {
+                    "description": "Computer Extension Attribute to be created.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Computer Extension Attribute was successfully created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HrefResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. The server could not understand the request because of invalid syntax. Possible reasons are:</br> 1) Required fields are not provided in request body.</br> 2) Fields which are not associated with provided inputType has some value.</br> 3) Any values outside of the allowed range are included in the request body.</br> 4) LDAP is not configured.</br> 5) Error occured during database create operation.</br> 6) Duplicate_Field",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Create Computer Extension Attributes"
+                ],
+                "x-action": true
+            }
+        },
+        "/v1/computer-extension-attributes/delete-multiple": {
+            "post": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Delete multiple Computer Extension Attribute at once.",
+                "description": "IDs of the Computer Extension Attribute to be deleted.",
+                "requestBody": {
+                    "description": "IDs of the Computer Extension Attribute to be deleted",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Ids"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "All specified Computer Extension Attribute deleted successfully."
+                    },
+                    "400": {
+                        "description": "Bad Request. Returns error codes and IDs for any Computer Extension Attribute that were unable to be deleted. Possible reasons are:</br> 1) The specified extension attribute id does not include a valid number.</br> 2) The specified extension attribute id does not exist in Jamf Pro.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Delete Computer Extension Attributes"
+                ],
+                "x-action": true
+            }
+        },
+        "/v1/computer-extension-attributes/{id}": {
+            "get": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Get specified Computer Extension Attribute object.",
+                "description": "Gets specified Computer Extension Attribute object.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unique ID of Computer Extension Attribute.",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Computer Extension Attribute object has been fetched successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. The server could not understand the request because of invalid syntax. Possible reason can be 'The specified extension attribute id does not include a valid number.'"
+                    },
+                    "404": {
+                        "description": "Specified Computer Extension Attribute object could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Computer Extension Attributes"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Update specified Computer Extension Attribute object.",
+                "description": "Update specified Computer Extension Attribute object.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unique ID of Computer Extension Attribute.",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Computer Extension Attribute object to be updated. IDs defined in this body will be ignored.",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Computer Extension Attribute updated successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Specified Computer Extension Attribute could not be updated due to bad request. Possible reasons are:</br> 1) The specified extension attribute id does not include a valid number.</br> 2) Duplicate_Field.</br> 3) Required fields are not provided in request body.</br> 4) Fields which are not associated with provided inputType has some value.</br> 5) Any values outside of the allowed range are included in the request body.</br> 6) LDAP is not configured.</br> 7) Error occured during database update operation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Specified Computer Extension Attribute object does not exist. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update Computer Extension Attributes"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Remove specified Computer Extension Attribute.",
+                "description": "ID of the Computer Extension Attribute to be deleted.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unique ID of Computer Extension Attribute.",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Computer Extension Attribute deleted successfully."
+                    },
+                    "400": {
+                        "description": "Bad Request. The server could not understand the request because of invalid syntax. Possible reason can be 'The specified extension attribute id does not include a valid number.'"
+                    },
+                    "404": {
+                        "description": "Specified Computer Extension Attribute object could not be found. The server either did not find a current representation for the requested resource or is trying to hide its existence from an unauthorized client."
+                    }
+                },
+                "x-required-privileges": [
+                    "Delete Computer Extension Attributes"
+                ]
+            }
+        },
+        "/v1/computer-extension-attributes/{id}/history": {
+            "get": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Get specified Computer Extension Attribute History object",
+                "description": "Get specified Computer Extension Attribute history object",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Instance ID of Computer Extension Attribute history",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorts results by one or more criteria, following the format property:asc/desc. Default sort is ID:asc. If using multiple criteria, separate with commas.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "id:asc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Filters results. Use RSQL format for query. Allows for many fields, including ID, name, etc. Can be combined with paging and sorting. Default filter is an empty query and returns all results from the requested page.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of Computer Extension Attribute history were found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HistorySearchResults"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Specified Computer Extension Attribute history object could not be found. Possible reason can be 'Provided id field is not string of positive numeric value or -1'.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Computer Extension Attributes"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "computer-extension-attributes"
+                ],
+                "summary": "Add specified Computer Extension Attribute history object notes",
+                "description": "Add specified Computer Extension Attribute history object notes",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Instance ID of Computer Extension Attribute history",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "History note to be created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ObjectHistoryNote"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Computer Extension Attribute history note created successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ObjectHistory"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Error creating history note. Possible reason can be 'Provided id field is not string of positive numeric value or -1'.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update Computer Extension Attributes"
+                ]
+            }
+        },
         "/v1/computer-groups": {
             "get": {
                 "tags": [
@@ -6251,7 +6693,7 @@
                     {
                         "name": "sort",
                         "in": "query",
-                        "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `general.name:asc`. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`, `general.remoteManagement.managementUsername`,\n`general.mdmCertificateExpiration`, `general.platform`,\n`hardware.make`, `hardware.model`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,\n`userAndLocation.realname`,\n`purchasing.lifeExpectancy`, `purchasing.warrantyDate`\n\nExample: `sort=udid:desc,general.name:asc`.\n",
+                        "description": "Sorting criteria in the format: `property:asc/desc`. Default sort\nis `general.name:asc`. Multiple sort criteria are supported and must be separated with\na comma.\n\nFields allowed in the sort: `general.name`, `udid`, `id`, `general.assetTag`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`,\n`general.mdmCertificateExpiration`, `general.platform`,\n`hardware.make`, `hardware.model`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`,\n`userAndLocation.realname`,\n`purchasing.lifeExpectancy`, `purchasing.warrantyDate`\n\nExample: `sort=udid:desc,general.name:asc`.\n",
                         "required": false,
                         "style": "form",
                         "explode": true,
@@ -6268,7 +6710,7 @@
                     {
                         "name": "filter",
                         "in": "query",
-                        "description": "Query in the RSQL format, allowing to filter computer inventory collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`, `general.barcode2`,\n`general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`, `general.itunesStoreAccountActive`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`, `general.lastReportedIp`, `general.managementId`, `general.remoteManagement.managed`, `general.remoteManagement.managementUsername`,\n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, \n`hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`, `hardware.modelIdentifier`, `hardware.serialNumber`,\n`hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,\n`security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`, `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,\n`userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`, `userAndLocation.username`,\n`purchasing.appleCareId`, `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`, `purchasing.warrantyDate`,\n\nThis param can be combined with paging and sorting.\nExample: `filter=general.name==\"Orchard\"`\n",
+                        "description": "Query in the RSQL format, allowing to filter computer inventory collection.\nDefault filter is empty query - returning all results for the requested page.\n\nFields allowed in the query: `general.name`, `udid`, `id`, `general.assetTag`, `general.barcode1`, `general.barcode2`,\n`general.enrolledViaAutomatedDeviceEnrollment`, `general.lastIpAddress`, `general.itunesStoreAccountActive`,\n`general.jamfBinaryVersion`, `general.lastContactTime`, `general.lastEnrolledDate`, `general.lastCloudBackupDate`,\n`general.reportDate`, `general.lastReportedIp`, `general.managementId`, `general.remoteManagement.managed`,\n`general.mdmCapable.capable`, `general.mdmCertificateExpiration`, `general.platform`, `general.supervised`, `general.userApprovedMdm`, `general.declarativeDeviceManagementEnabled`, \n`hardware.bleCapable`, `hardware.macAddress`, `hardware.make`, `hardware.model`, `hardware.modelIdentifier`, `hardware.serialNumber`,\n`hardware.supportsIosAppInstalls`,`hardware.appleSilicon`, `operatingSystem.activeDirectoryStatus`, `operatingSystem.fileVault2Status`,\n`operatingSystem.build`, `operatingSystem.supplementalBuildVersion`, `operatingSystem.rapidSecurityResponse`, `operatingSystem.name`, `operatingSystem.version`, `security.activationLockEnabled`,\n`security.recoveryLockEnabled`,`security.firewallEnabled`,`userAndLocation.buildingId`, `userAndLocation.departmentId`, `userAndLocation.email`, `userAndLocation.realname`,\n`userAndLocation.phone`, `userAndLocation.position`,`userAndLocation.room`, `userAndLocation.username`,\n`purchasing.appleCareId`, `purchasing.lifeExpectancy`, `purchasing.purchased`, `purchasing.leased`, `purchasing.vendor`, `purchasing.warrantyDate`,\n\nThis param can be combined with paging and sorting.\nExample: `filter=general.name==\"Orchard\"`\n",
                         "required": false,
                         "style": "form",
                         "explode": true,
@@ -7010,6 +7452,28 @@
                 ]
             }
         },
+        "/v1/csa/tenant-id": {
+            "get": {
+                "tags": [
+                    "csa"
+                ],
+                "summary": "Returns the CSA tenant ID.",
+                "description": "Returns the CSA tenant ID.",
+                "responses": {
+                    "200": {
+                        "description": "CSA tenant ID is returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CsaTenantIdInfo"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-authentication-required": true
+            }
+        },
         "/v1/csa/token": {
             "get": {
                 "tags": [
@@ -7099,6 +7563,50 @@
                     }
                 },
                 "x-authentication-required": true
+            }
+        },
+        "/v1/ddm/{clientManagementId}/sync": {
+            "post": {
+                "tags": [
+                    "declarative-device-management"
+                ],
+                "summary": "Force a device DDM sync",
+                "description": "Force a device to sync by queuing a new DeclarativeManagementCommand",
+                "parameters": [
+                    {
+                        "name": "clientManagementId",
+                        "in": "path",
+                        "description": "The client management id of the target device.",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The device was successfully synced."
+                    },
+                    "403": {
+                        "description": "Insufficient privileges to perform this action."
+                    },
+                    "500": {
+                        "description": "Failure, unable to complete sync request.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Send Declarative Management Command"
+                ],
+                "x-action": true
             }
         },
         "/v1/departments": {
@@ -8568,6 +9076,54 @@
                 },
                 "x-required-privileges": [
                     "Delete Dock Items"
+                ]
+            }
+        },
+        "/v1/dss-declarations/{id}": {
+            "get": {
+                "tags": [
+                    "dss-declarations"
+                ],
+                "summary": "Retrieve a declaration from DSS",
+                "description": "Retrieves a Declaration from DSS",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Declaration Uuid",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DssDeclarations"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "DSS declaration with that uuid does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Mobile Devices",
+                    "Read Computers"
                 ]
             }
         },
@@ -13004,7 +13560,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/LoginContent"
+                                "$ref": "#/components/schemas/LoginContentPut"
                             }
                         }
                     },
@@ -13016,13 +13572,10 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/LoginContent"
+                                    "$ref": "#/components/schemas/LoginContentPut"
                                 }
                             }
                         }
-                    },
-                    "403": {
-                        "description": "User tried updating StateRAMP disclaimer content which is forbidden."
                     }
                 },
                 "x-authentication-required": true
@@ -13137,7 +13690,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve available macOS and iOS Managed Software Updates",
-                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieves available macOS and iOS Managed Software Updates\n",
+                "description": "Retrieves available macOS and iOS Managed Software Updates\n",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -13159,7 +13712,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Plans",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\nRetrieve Managed Software Update Plans\n",
+                "description": "Retrieve Managed Software Update Plans\n",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/page"
@@ -13230,7 +13783,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Create a Managed Software Update Plan",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\nCreates a Managed Software Update Plan.\n",
+                "description": "Creates a Managed Software Update Plan.\n",
                 "requestBody": {
                     "description": "Managed Software Update Plan to create",
                     "content": {
@@ -13290,7 +13843,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve current value of the Feature Toggle",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\n  Retrieves current value of the Feature Toggle\n",
+                "description": "Retrieves current value of the Feature Toggle\n",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -13312,7 +13865,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Updates Feature Toggle Value",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\n  Updates the value of the Feature Toggle - This endpoint is asynchronous, the provided value will not be immediately updated. Please use the following endpoint to track the status of your toggle request. /v1/managed-software-updates/plans/feature-toggle/status:\n",
+                "description": "Updates the value of the Feature Toggle - This endpoint is asynchronous, the provided value will not be immediately updated. Please use the following endpoint to track the status of your toggle request. /v1/managed-software-updates/plans/feature-toggle/status:\n",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -13358,7 +13911,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Force stops any ongoing or stalled feature-toggle processes",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\n\"Break Glass\" endpoint, not for nominal usage.\nUse this endpoint to forcefully abandon the feature-toggle background process if the status of the feature-toggle is 'stuck' or has reached an non-restartable failed state.\nUsage of this endpoint under nominal conditions is undefined and unsupported.\n",
+                "description": "\"Break Glass\" endpoint, not for nominal usage.\nUse this endpoint to forcefully abandon the feature-toggle background process if the status of the feature-toggle is 'stuck' or has reached an non-restartable failed state.\nUsage of this endpoint under nominal conditions is undefined and unsupported.\n",
                 "responses": {
                     "204": {
                         "description": "Managed Software Update Plan Feature Toggle abandon request was received"
@@ -13388,7 +13941,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieves background status of the Feature Toggle",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\nRetrieves background status of the Feature Toggle\n",
+                "description": "Retrieves background status of the Feature Toggle\n",
                 "responses": {
                     "200": {
                         "description": "Managed Software Update Plan Feature Toggle Status was retrieved",
@@ -13422,7 +13975,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Create Managed Software Update Plans for a Group",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\nCreates Managed Software Update Plans for a Group\n",
+                "description": "Creates Managed Software Update Plans for a Group\n",
                 "requestBody": {
                     "description": "Managed Software Update Plan to create for Group",
                     "content": {
@@ -13496,7 +14049,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Plans for a Group",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\nRetrieves Managed Software Update Plans for a Group\n",
+                "description": "Retrieves Managed Software Update Plans for a Group\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -13575,7 +14128,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve a Managed Software Update Plan",
-                "description": "## BETA\n\nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n\nRetrieves a Managed Software Update Plan\n",
+                "description": "Retrieves a Managed Software Update Plan\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -13618,13 +14171,111 @@
                 ]
             }
         },
+        "/v1/managed-software-updates/plans/{id}/declarations": {
+            "get": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Retrieve all Declarations associated with a Managed Software Update Plan",
+                "description": "Retrieves all Declarations associated with a Managed Software Update Plan\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Managed Software Update Plan Uuid",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DssDeclarations"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Managed Software Update Plan with that id does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Managed Software Updates",
+                    "Read Computers",
+                    "Read Mobile Devices"
+                ]
+            }
+        },
+        "/v1/managed-software-updates/plans/{id}/events": {
+            "get": {
+                "tags": [
+                    "managed-software-updates"
+                ],
+                "summary": "Retrieve a Managed Software Update Plan Event Store",
+                "description": "Retrieves a Managed Software Update Plan Event Store\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Managed Software Update Plan Uuid",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagedSoftwareUpdatePlanEventStore"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Managed Software Update Plan with that id does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Managed Software Updates",
+                    "Read Computers",
+                    "Read Mobile Devices"
+                ]
+            }
+        },
         "/v1/managed-software-updates/update-statuses": {
             "get": {
                 "tags": [
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses",
-                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses\n",
+                "description": "Retrieve Managed Software Update Statuses\n",
                 "parameters": [
                     {
                         "name": "filter",
@@ -13715,7 +14366,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Computer Groups",
-                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Computer Groups\n",
+                "description": "Retrieve Managed Software Update Statuses for Computer Groups\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -13785,7 +14436,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Computers",
-                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Computers\n",
+                "description": "Retrieve Managed Software Update Statuses for Computers\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -13853,7 +14504,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Mobile Device Groups",
-                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Mobile Device Groups\n",
+                "description": "Retrieve Managed Software Update Statuses for Mobile Device Groups\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -13915,7 +14566,7 @@
                     "managed-software-updates"
                 ],
                 "summary": "Retrieve Managed Software Update Statuses for Mobile Devices",
-                "description": "## BETA\n  \nThese endpoints are available for use in your workflows. It is extremely important to exercise caution when implementing these endpoints, because elements such as the URL or the response could change while this feature is in Beta. If this is the case, we will communicate that upcoming change but there will be no deprecation timeline. Any breaking changes to the API that occur *after* the Beta phase __will be__ held to the standard year-long deprecation timeline.\n  \nRetrieve Managed Software Update Statuses for Mobile Devices\n",
+                "description": "Retrieve Managed Software Update Statuses for Mobile Devices\n",
                 "parameters": [
                     {
                         "name": "id",
@@ -15444,160 +16095,6 @@
                 "x-deprecation-date": "2020-04-07",
                 "x-required-privileges": [
                     "Update Mobile Device PreStage Enrollments"
-                ]
-            }
-        },
-        "/v1/mobile-devices": {
-            "get": {
-                "tags": [
-                    "mobile-devices"
-                ],
-                "summary": "Get Mobile Device objects\n",
-                "description": "Gets Mobile Device objects.\n",
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/MobileDevice"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-deprecation-date": "2020-04-16",
-                "x-required-privileges": [
-                    "Read Mobile Devices"
-                ]
-            }
-        },
-        "/v1/mobile-devices/{id}": {
-            "get": {
-                "tags": [
-                    "mobile-devices"
-                ],
-                "summary": "Get Mobile Device\n",
-                "description": "Get MobileDevice",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "instance id of mobile device record",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MobileDevice"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-deprecation-date": "2020-04-16",
-                "x-required-privileges": [
-                    "Read Mobile Devices"
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "mobile-devices"
-                ],
-                "summary": "Update fields on a mobile device that are allowed to be modified by users\n",
-                "description": "Updates fields on a mobile device that are allowed to be modified by users.",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "instance id of mobile device record",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateMobileDevice"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MobileDeviceDetails"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-deprecation-date": "2020-04-16",
-                "x-required-privileges": [
-                    "Update Mobile Devices"
-                ]
-            }
-        },
-        "/v1/mobile-devices/{id}/detail": {
-            "get": {
-                "tags": [
-                    "mobile-devices"
-                ],
-                "summary": "Get Mobile Device\n",
-                "description": "Get MobileDevice",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "instance id of mobile device record",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MobileDeviceDetails"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-deprecation-date": "2020-04-16",
-                "x-required-privileges": [
-                    "Read Mobile Devices"
                 ]
             }
         },
@@ -19110,42 +19607,6 @@
                 ]
             }
         },
-        "/v1/search-mobile-devices": {
-            "post": {
-                "tags": [
-                    "mobile-devices"
-                ],
-                "summary": "Search Mobile Devices\n",
-                "description": "Search Mobile Devices",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/MobileDeviceSearchParams"
-                            }
-                        }
-                    },
-                    "required": false
-                },
-                "responses": {
-                    "200": {
-                        "description": "Found buildings matching search params.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MobileDeviceSearchResults"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-deprecation-date": "2020-04-16",
-                "x-required-privileges": [
-                    "Read Mobile Devices"
-                ]
-            }
-        },
         "/v1/self-service/branding/ios": {
             "get": {
                 "tags": [
@@ -19740,6 +20201,45 @@
                 "x-required-privileges": [
                     "Read Sites"
                 ]
+            }
+        },
+        "/v1/slasa": {
+            "get": {
+                "tags": [
+                    "slasa"
+                ],
+                "summary": "Get the status of SLASA",
+                "description": "Get if SLASA has been accepted or not",
+                "responses": {
+                    "200": {
+                        "description": "Whether SLASA has been accepted or not",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SlasaAcceptance"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-authentication-required": false
+            },
+            "post": {
+                "tags": [
+                    "slasa"
+                ],
+                "summary": "Accept the SLASA",
+                "description": "Accept the SLASA for Jamf Pro.",
+                "responses": {
+                    "204": {
+                        "description": "SLASA has been accepted"
+                    }
+                },
+                "x-required-privileges": [
+                    "Update Activation Code",
+                    "View JSS Information"
+                ],
+                "x-action": true
             }
         },
         "/v1/smart-computer-groups/{id}/recalculate": {
@@ -23290,6 +23790,146 @@
                 },
                 "x-required-privileges": [
                     "Update LDAP Servers"
+                ]
+            }
+        },
+        "/v2/computer-groups/smart-group-membership/{id}": {
+            "get": {
+                "tags": [
+                    "computer-groups"
+                ],
+                "summary": "Get the membership of a Smart Computer Group\n",
+                "description": "Gets the membership of a Smart Computer Group\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the Smart Computer Group",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - Smart Computer Group membership retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmartGroupMembership"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Smart Computer Group with the specified id does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Smart Computer Groups"
+                ]
+            }
+        },
+        "/v2/computer-groups/smart-groups": {
+            "get": {
+                "tags": [
+                    "computer-groups"
+                ],
+                "summary": "Search for Smart Computer Groups\n",
+                "description": "Search for Smart Computer Groups\n",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is id:asc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=name:asc",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "id:asc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter smart computer group collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: id, name. Example: name==\"*group*\"",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmartGroupSearchResult"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Smart Computer Groups"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "computer-groups"
+                ],
+                "summary": "Create a Smart Computer Group\n",
+                "description": "Creates a Smart Computer Group\n",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SmartComputerGroupPost"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful response - Smart Computer Group created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HrefResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Create Smart Computer Groups"
                 ]
             }
         },
@@ -29971,6 +30611,20 @@
                 ],
                 "summary": "Updates Jamf Pro SMTP Server information\n",
                 "description": "Updates Jamf Pro SMTP Server information. If requiresAuthentication is set to true, a username and password must be provided\n",
+                "parameters": [
+                    {
+                        "name": "oauth-state",
+                        "in": "query",
+                        "description": "The OAuth state that was last used to authorize a Google Mail account. This is only required when the authentication type is Google Mail and new accounts are being added.",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
                 "requestBody": {
                     "description": "SMTP Server to update",
                     "content": {
@@ -32331,67 +32985,6 @@
                     }
                 }
             },
-            "AndroidDetails": {
-                "type": "object",
-                "properties": {
-                    "osName": {
-                        "type": "string",
-                        "example": "Black Licorice"
-                    },
-                    "manufacturer": {
-                        "type": "string",
-                        "example": "Google"
-                    },
-                    "model": {
-                        "type": "string",
-                        "example": "Pixel 2"
-                    },
-                    "internalCapacityMb": {
-                        "type": "integer",
-                        "example": 30000
-                    },
-                    "internalAvailableMb": {
-                        "type": "integer",
-                        "example": 20000
-                    },
-                    "internalPercentUsed": {
-                        "type": "integer",
-                        "example": 67
-                    },
-                    "externalCapacityMb": {
-                        "type": "integer",
-                        "example": 20000
-                    },
-                    "externalAvailableMb": {
-                        "type": "integer",
-                        "example": 10000
-                    },
-                    "externalPercentUsed": {
-                        "type": "integer",
-                        "example": 50
-                    },
-                    "batteryLevel": {
-                        "type": "integer",
-                        "example": 100
-                    },
-                    "lastBackupTimestamp": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2018-10-15T16:39:56.307Z"
-                    },
-                    "apiVersion": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "computer": {
-                        "$ref": "#/components/schemas/IdAndName"
-                    },
-                    "security": {
-                        "$ref": "#/components/schemas/Security"
-                    }
-                },
-                "description": "will be populated if the type is android."
-            },
             "ApiError": {
                 "type": "object",
                 "properties": {
@@ -32739,50 +33332,6 @@
                     }
                 }
             },
-            "AppleTvDetails": {
-                "type": "object",
-                "properties": {
-                    "model": {
-                        "type": "string",
-                        "example": "Apple TV 3rd Generation Rev 2"
-                    },
-                    "modelIdentifier": {
-                        "type": "string",
-                        "example": "AppleTV3,2"
-                    },
-                    "modelNumber": {
-                        "type": "string",
-                        "example": "MD199LL"
-                    },
-                    "isSupervised": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "airplayPassword": {
-                        "type": "string",
-                        "format": "password",
-                        "example": "1234"
-                    },
-                    "deviceId": {
-                        "type": "string",
-                        "example": "1"
-                    },
-                    "locales": {
-                        "type": "string",
-                        "example": "null"
-                    },
-                    "purchasing": {
-                        "$ref": "#/components/schemas/Purchasing"
-                    },
-                    "configurationProfiles": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ConfigurationProfile"
-                        }
-                    }
-                },
-                "description": "will be populated if the type is appleTv."
-            },
             "ApplicationAttributes": {
                 "type": "object",
                 "properties": {
@@ -32807,6 +33356,28 @@
                         "example": "com.jamf.selfservice"
                     }
                 }
+            },
+            "ApplyRedemptionCodeCommand": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/MdmCommandBase"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "identifier": {
+                                "type": "string",
+                                "description": "The bundle identifier of the app",
+                                "example": "com.example.app"
+                            },
+                            "redemptionCode": {
+                                "type": "string",
+                                "description": "The redemption code that applies to the app pending installation",
+                                "example": "SB56LT7YX8RH"
+                            }
+                        }
+                    }
+                ]
             },
             "AssignRemoveProfileResponseSyncState": {
                 "type": "object",
@@ -33070,7 +33641,8 @@
                     "CLOUD_CONNECTOR",
                     "SYSTEM_ACCOUNT",
                     "USER_ENROLLMENT",
-                    "CLIENT_CREDENTIALS"
+                    "CLIENT_CREDENTIALS",
+                    "M2M"
                 ]
             },
             "Authorization": {
@@ -33672,7 +34244,7 @@
                     },
                     "md5Sum": {
                         "type": "string",
-                        "description": "The md5 checksum of the certificate file. Intended to be used in verifification the cert being used to sign QuickAdd packages.",
+                        "description": "The md5 checksum of the certificate file. Intended to be used in verification the cert being used to sign QuickAdd packages.",
                         "readOnly": true,
                         "default": ""
                     }
@@ -33848,6 +34420,16 @@
                     }
                 },
                 "description": "Classic Ldap mappings configuration"
+            },
+            "ClearRestrictionsPasswordCommand": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/MdmCommandBase"
+                    },
+                    {
+                        "type": "object"
+                    }
+                ]
             },
             "ClientCheckInV3": {
                 "type": "object",
@@ -34342,6 +34924,11 @@
                 "type": "object",
                 "properties": {
                     "cloudInstance": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "example": true
+                    },
+                    "rampInstance": {
                         "type": "boolean",
                         "nullable": false,
                         "example": true
@@ -35186,6 +35773,102 @@
                         ]
                     }
                 }
+            },
+            "ComputerExtensionAttributeSearchResults": {
+                "required": [
+                    "totalCount"
+                ],
+                "type": "object",
+                "properties": {
+                    "totalCount": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "results": {
+                        "minItems": 0,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ComputerExtensionAttributes"
+                        }
+                    }
+                }
+            },
+            "ComputerExtensionAttributes": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ExtensionAttributes"
+                    },
+                    {
+                        "required": [
+                            "inputType",
+                            "inventoryDisplayType"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "enabled": {
+                                "type": "boolean",
+                                "description": "Enabled by default, but for inputType Script we can disable it as well. <br/> Possible values are:<br/> false <br/> true",
+                                "example": true,
+                                "default": true
+                            },
+                            "inventoryDisplayType": {
+                                "type": "string",
+                                "description": "Category in which to display the extension attribute in Jamf Pro.",
+                                "example": "GENERAL",
+                                "enum": [
+                                    "GENERAL",
+                                    "HARDWARE",
+                                    "OPERATING_SYSTEM",
+                                    "USER_AND_LOCATION",
+                                    "PURCHASING",
+                                    "EXTENSION_ATTRIBUTES"
+                                ],
+                                "default": "GENERAL"
+                            },
+                            "inputType": {
+                                "type": "string",
+                                "description": "Extension attributes collect inventory data by using an input type.The type of the Input used to populate the extension attribute.",
+                                "enum": [
+                                    "SCRIPT",
+                                    "TEXT",
+                                    "POPUP",
+                                    "DIRECTORY_SERVICE_ATTRIBUTE_MAPPING"
+                                ],
+                                "default": "TEXT"
+                            },
+                            "scriptContents": {
+                                "type": "string",
+                                "description": "When we run this script it returns a data value each time a computer submits inventory to Jamf Pro. Provide scriptContents only when inputType is 'SCRIPT'.",
+                                "nullable": true,
+                                "example": "scriptContent"
+                            },
+                            "popupMenuChoices": {
+                                "minItems": 0,
+                                "type": "array",
+                                "description": "When added with list of choices while creating computer extension attributes these Pop-up menu can be displayed in inventory information. User can choose a value from the pop-up menu list when enrolling a computer any time using Jamf Pro. Provide popupMenuChoices only when inputType is 'POPUP'.",
+                                "example": [
+                                    "Test",
+                                    "Popup"
+                                ],
+                                "items": {
+                                    "type": "string",
+                                    "description": "Popup Menu choices."
+                                }
+                            },
+                            "ldapAttributeMapping": {
+                                "type": "string",
+                                "description": "Directory Service attribute use to populate the extension attribute. <br/> Required when inputType is \"DIRECTORY_SERVICE_ATTRIBUTE_MAPPING\"",
+                                "example": "ldapAttributeMapping"
+                            },
+                            "ldapExtensionAttributeAllowed": {
+                                "type": "boolean",
+                                "description": "Collect multiple values for this extension attribute. ldapExtensionAttributeAllowed is disabled by default, only for inputType 'DIRECTORY_SERVICE_ATTRIBUTE_MAPPING' it can be enabled. It's value cannot be modified during edit operation.<br/> Possible values are:<br/> false <br/> true <br/>",
+                                "example": false,
+                                "default": false
+                            }
+                        }
+                    }
+                ]
             },
             "ComputerFont": {
                 "type": "object",
@@ -36481,6 +37164,24 @@
                                 "type": "boolean",
                                 "nullable": false,
                                 "example": true
+                            },
+                            "prestageMinimumOsTargetVersionType": {
+                                "type": "string",
+                                "nullable": false,
+                                "example": "MINIMUM_OS_LATEST_VERSION",
+                                "enum": [
+                                    "NO_ENFORCEMENT",
+                                    "MINIMUM_OS_LATEST_VERSION",
+                                    "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                                    "MINIMUM_OS_LATEST_MINOR_VERSION",
+                                    "MINIMUM_OS_SPECIFIC_VERSION"
+                                ]
+                            },
+                            "minimumOsSpecificVersion": {
+                                "minLength": 0,
+                                "type": "string",
+                                "nullable": false,
+                                "example": "17.1"
                             }
                         }
                     }
@@ -36578,13 +37279,9 @@
                     },
                     "managementUsername": {
                         "type": "string",
-                        "example": "rootname"
-                    },
-                    "managementPassword": {
-                        "type": "string",
-                        "format": "password",
-                        "writeOnly": true,
-                        "example": "example password"
+                        "description": "This field always returns null, please use /local-admin-password/ endpoint instead.",
+                        "example": "rootname",
+                        "deprecated": true
                     }
                 }
             },
@@ -37070,9 +37767,27 @@
                     }
                 }
             },
+            "CsaTenantIdInfo": {
+                "type": "object",
+                "properties": {
+                    "tenantId": {
+                        "type": "string",
+                        "description": "The tenant ID",
+                        "nullable": true,
+                        "readOnly": true,
+                        "example": "123"
+                    }
+                }
+            },
             "CsaToken": {
                 "type": "object",
                 "properties": {
+                    "tenantId": {
+                        "type": "string",
+                        "description": "The tenant ID",
+                        "nullable": true,
+                        "example": "12345678"
+                    },
                     "subject": {
                         "type": "string",
                         "description": "Salesforce CRM account ID",
@@ -38271,6 +38986,30 @@
                     }
                 ]
             },
+            "DeviceLockCommand": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/MdmCommandBase"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string",
+                                "example": "message123"
+                            },
+                            "phoneNumber": {
+                                "type": "string",
+                                "example": "(123) 456-7890"
+                            },
+                            "pin": {
+                                "type": "string",
+                                "example": "pin123"
+                            }
+                        }
+                    }
+                ]
+            },
             "DiagnosticSubmissionSetting": {
                 "type": "string",
                 "example": "ENABLE_DIAGNOSTIC_SUBMISSION",
@@ -38327,6 +39066,51 @@
                     }
                 },
                 "description": "The URL to download a file from."
+            },
+            "DssDeclaration": {
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "72676372-af55-432f-acd8-12984522e472"
+                    },
+                    "payloadJson": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "{}"
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true,
+                        "example": "com.apple.configuration.management.status-subscriptions"
+                    },
+                    "group": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "activation",
+                        "enum": [
+                            "ACTIVATION",
+                            "ASSET",
+                            "CONFIGURATION",
+                            "MANAGEMENT"
+                        ]
+                    }
+                }
+            },
+            "DssDeclarations": {
+                "type": "object",
+                "properties": {
+                    "declarations": {
+                        "type": "array",
+                        "nullable": false,
+                        "items": {
+                            "$ref": "#/components/schemas/DssDeclaration"
+                        },
+                        "default": []
+                    }
+                }
             },
             "Ebook": {
                 "type": "object",
@@ -39530,6 +40314,10 @@
                         "type": "boolean",
                         "default": false
                     },
+                    "flushSoftwareUpdatePlans": {
+                        "type": "boolean",
+                        "default": false
+                    },
                     "flushMdmCommandsOnReenroll": {
                         "type": "string",
                         "enum": [
@@ -39767,39 +40555,6 @@
                     }
                 }
             },
-            "ExtensionAttribute": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "type": "string",
-                        "example": "Example EA"
-                    },
-                    "type": {
-                        "type": "string",
-                        "example": "STRING",
-                        "enum": [
-                            "STRING",
-                            "INTEGER",
-                            "DATE"
-                        ]
-                    },
-                    "value": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "example": "EA Value"
-                        }
-                    },
-                    "isExtensionAttributeCollectionAllowed": {
-                        "type": "boolean",
-                        "example": false
-                    }
-                }
-            },
             "ExtensionAttributeV2": {
                 "type": "object",
                 "properties": {
@@ -39831,6 +40586,41 @@
                     "extensionAttributeCollectionAllowed": {
                         "type": "boolean",
                         "example": false
+                    }
+                }
+            },
+            "ExtensionAttributes": {
+                "required": [
+                    "dataType",
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique Id for Computer Extension Attribute.",
+                        "readOnly": true,
+                        "example": "1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Display name for the extension attribute.",
+                        "example": "ComputerExtensionAttribute"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description for the extension attribute.",
+                        "example": "Computer Extension Attribute"
+                    },
+                    "dataType": {
+                        "type": "string",
+                        "description": "Type of data being collected.",
+                        "enum": [
+                            "INTEGER",
+                            "STRING",
+                            "DATE"
+                        ],
+                        "default": "STRING"
                     }
                 }
             },
@@ -40505,19 +41295,6 @@
                     "id": {
                         "type": "integer",
                         "example": 5
-                    }
-                }
-            },
-            "IdAndName": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "type": "string",
-                        "example": "A name"
                     }
                 }
             },
@@ -41608,130 +42385,6 @@
                     }
                 }
             },
-            "IosDetails": {
-                "type": "object",
-                "properties": {
-                    "model": {
-                        "type": "string",
-                        "example": "iPad 5th Generation (Wi-Fi)"
-                    },
-                    "modelIdentifier": {
-                        "type": "string",
-                        "example": "ipad6,11"
-                    },
-                    "modelNumber": {
-                        "type": "string",
-                        "example": "MP2F2LL"
-                    },
-                    "isSupervised": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "batteryLevel": {
-                        "type": "integer",
-                        "example": 100
-                    },
-                    "lastBackupTimestamp": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2018-10-15T16:39:56.307Z"
-                    },
-                    "capacityMb": {
-                        "type": "integer",
-                        "example": 27503
-                    },
-                    "availableMb": {
-                        "type": "integer",
-                        "example": 26646
-                    },
-                    "percentageUsed": {
-                        "type": "integer",
-                        "example": 3
-                    },
-                    "isShared": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isDeviceLocatorServiceEnabled": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isDoNotDisturbEnabled": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isCloudBackupEnabled": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "lastCloudBackupTimestamp": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2018-10-15T16:39:56.307Z"
-                    },
-                    "isLocationServicesEnabled": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isITunesStoreAccountActive": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isBleCapable": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "computer": {
-                        "$ref": "#/components/schemas/IdAndName"
-                    },
-                    "purchasing": {
-                        "$ref": "#/components/schemas/Purchasing"
-                    },
-                    "security": {
-                        "$ref": "#/components/schemas/Security"
-                    },
-                    "network": {
-                        "$ref": "#/components/schemas/Network"
-                    },
-                    "applications": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MobileDeviceApplication"
-                        }
-                    },
-                    "certificates": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MobileDeviceCertificateV1"
-                        }
-                    },
-                    "ebooks": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MobileDeviceEbook"
-                        }
-                    },
-                    "configurationProfiles": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ConfigurationProfile"
-                        }
-                    },
-                    "provisioningProfiles": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MobileDeviceProvisioningProfiles"
-                        }
-                    },
-                    "attachments": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MobileDeviceAttachment"
-                        }
-                    }
-                },
-                "description": "will be populated if the type is ios."
-            },
             "JamfApplicationResponse": {
                 "type": "object",
                 "properties": {
@@ -42689,41 +43342,6 @@
                     }
                 }
             },
-            "Location": {
-                "type": "object",
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "example": "admin"
-                    },
-                    "realName": {
-                        "type": "string",
-                        "example": "IT Bob"
-                    },
-                    "emailAddress": {
-                        "type": "string",
-                        "example": "ITBob@jamf.com"
-                    },
-                    "position": {
-                        "type": "string",
-                        "example": "IT Team Lead"
-                    },
-                    "phoneNumber": {
-                        "type": "string",
-                        "example": "555-555-5555"
-                    },
-                    "department": {
-                        "$ref": "#/components/schemas/IdAndName"
-                    },
-                    "building": {
-                        "$ref": "#/components/schemas/IdAndName"
-                    },
-                    "room": {
-                        "type": "string",
-                        "example": "4th Floor - Quad 3"
-                    }
-                }
-            },
             "LocationInformation": {
                 "required": [
                     "buildingId",
@@ -42896,6 +43514,34 @@
                         "nullable": false,
                         "example": false
                     },
+                    "includeCustomDisclaimer": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "example": true
+                    },
+                    "disclaimerHeading": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "Disclaimer header"
+                    },
+                    "disclaimerMainText": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "Login disclaimer main text"
+                    },
+                    "actionText": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "Accept"
+                    }
+                }
+            },
+            "LoginContentPut": {
+                "required": [
+                    "includeCustomDisclaimer"
+                ],
+                "type": "object",
+                "properties": {
                     "includeCustomDisclaimer": {
                         "type": "boolean",
                         "nullable": false,
@@ -43098,15 +43744,23 @@
                             "LATEST_MINOR",
                             "LATEST_ANY",
                             "SPECIFIC_VERSION",
+                            "CUSTOM_VERSION",
                             "UNKNOWN"
                         ]
                     },
                     "specificVersion": {
                         "type": "string",
-                        "description": "Optional. Indicates the specific version to update to. Only available when the version type is set to specific version, otherwise defaults to NO_SPECIFIC_VERSION.",
+                        "description": "Optional. Indicates the specific version to update to. Only available when the version type is set to specific version or custom version, otherwise defaults to NO_SPECIFIC_VERSION.",
                         "readOnly": true,
                         "example": "12.6.1",
                         "default": "NO_SPECIFIC_VERSION"
+                    },
+                    "buildVersion": {
+                        "type": "string",
+                        "description": "Optional. Indicates the build version to update to. Only available when the version type is set to custom version.",
+                        "nullable": true,
+                        "readOnly": true,
+                        "example": "21F79"
                     },
                     "maxDeferrals": {
                         "minimum": 0,
@@ -43130,6 +43784,17 @@
                     },
                     "status": {
                         "$ref": "#/components/schemas/PlanStatus"
+                    }
+                }
+            },
+            "ManagedSoftwareUpdatePlanEventStore": {
+                "type": "object",
+                "properties": {
+                    "events": {
+                        "type": "string",
+                        "nullable": false,
+                        "readOnly": true,
+                        "default": ""
                     }
                 }
             },
@@ -43194,6 +43859,12 @@
                         "example": false
                     },
                     "forceInstallLocalDateEnabled": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "readOnly": true,
+                        "example": false
+                    },
+                    "customVersionEnabled": {
                         "type": "boolean",
                         "nullable": false,
                         "readOnly": true,
@@ -43532,8 +44203,11 @@
                         "discriminator": {
                             "propertyName": "commandType",
                             "mapping": {
+                                "APPLY_REDEMPTION_CODE": "ApplyRedemptionCodeCommandDef.yaml#/components/schemas/ApplyRedemptionCodeCommand",
+                                "CLEAR_RESTRICTIONS_PASSWORD": "MdmCommandsLibrary.yaml#/components/schemas/ClearRestrictionsPasswordCommand",
                                 "DECLARATIVE_MANAGEMENT": "DeclarativeManagementCommandDef.yaml#/components/schemas/DeclarativeManagementCommand",
                                 "DELETE_USER": "MdmCommandsLibrary.yaml#/components/schemas/DeleteUserCommand",
+                                "DEVICE_LOCK": "DeviceLockCommandDef.yaml#/components/schemas/DeviceLockCommand",
                                 "ENABLE_LOST_MODE": "MdmCommandsLibrary.yaml#/components/schemas/EnableLostModeCommand",
                                 "ERASE_DEVICE": "EraseDeviceCommandDef.yaml#/components/schemas/EraseDeviceCommand",
                                 "LOG_OUT_USER": "MdmCommandsLibrary.yaml#/components/schemas/LogOutUserCommand",
@@ -43547,10 +44221,19 @@
                         },
                         "oneOf": [
                             {
+                                "$ref": "#/components/schemas/ApplyRedemptionCodeCommand"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ClearRestrictionsPasswordCommand"
+                            },
+                            {
                                 "$ref": "#/components/schemas/DeclarativeManagementCommand"
                             },
                             {
                                 "$ref": "#/components/schemas/DeleteUserCommand"
+                            },
+                            {
+                                "$ref": "#/components/schemas/DeviceLockCommand"
                             },
                             {
                                 "$ref": "#/components/schemas/EnableLostModeCommand"
@@ -43612,8 +44295,11 @@
                 "type": "string",
                 "example": "ENABLE_LOST_MODE",
                 "enum": [
+                    "APPLY_REDEMPTION_CODE",
+                    "CLEAR_RESTRICTIONS_PASSWORD",
                     "DECLARATIVE_MANAGEMENT",
                     "DELETE_USER",
+                    "DEVICE_LOCK",
                     "ENABLE_LOST_MODE",
                     "ERASE_DEVICE",
                     "LOG_OUT_USER",
@@ -43699,61 +44385,6 @@
                     }
                 }
             },
-            "MobileDevice": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "type": "string",
-                        "example": "iPad"
-                    },
-                    "serialNumber": {
-                        "type": "string",
-                        "example": "DMQVGC0DHLA0"
-                    },
-                    "wifiMacAddress": {
-                        "type": "string",
-                        "example": "C4:84:66:92:78:00"
-                    },
-                    "udid": {
-                        "type": "string",
-                        "example": "0dad565fb40b010a9e490440188063a378721069"
-                    },
-                    "phoneNumber": {
-                        "type": "string",
-                        "example": "651-555-5555 Ext111"
-                    },
-                    "model": {
-                        "type": "string",
-                        "example": "iPad 5th Generation (Wi-Fi)"
-                    },
-                    "modelIdentifier": {
-                        "type": "string",
-                        "example": "iPad6,11"
-                    },
-                    "username": {
-                        "type": "string",
-                        "example": "admin"
-                    },
-                    "type": {
-                        "type": "string",
-                        "example": "ios",
-                        "enum": [
-                            "ios",
-                            "appleTv",
-                            "android",
-                            "unknown"
-                        ]
-                    },
-                    "softwareUpdateDeviceId": {
-                        "type": "string",
-                        "example": "J132AP"
-                    }
-                }
-            },
             "MobileDeviceApplication": {
                 "type": "object",
                 "properties": {
@@ -43812,20 +44443,6 @@
                     }
                 }
             },
-            "MobileDeviceAttachment": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "example": "Bob's Attachment"
-                    },
-                    "id": {
-                        "type": "integer",
-                        "readOnly": true,
-                        "example": 1
-                    }
-                }
-            },
             "MobileDeviceAttachmentV2": {
                 "type": "object",
                 "properties": {
@@ -43855,19 +44472,6 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2019-02-04T21:09:31.661Z"
-                    }
-                }
-            },
-            "MobileDeviceCertificateV1": {
-                "type": "object",
-                "properties": {
-                    "commonName": {
-                        "type": "string",
-                        "example": "3B259E4B-FAD5-4860-B1DD-336ADA786EBA"
-                    },
-                    "isIdentity": {
-                        "type": "boolean",
-                        "example": false
                     }
                 }
             },
@@ -43924,120 +44528,6 @@
                     }
                 }
             },
-            "MobileDeviceDetails": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "name": {
-                        "type": "string",
-                        "example": "Jon's iPad"
-                    },
-                    "assetTag": {
-                        "type": "string",
-                        "example": "12345"
-                    },
-                    "lastInventoryUpdateTimestamp": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2018-10-15T16:39:56.307Z"
-                    },
-                    "osVersion": {
-                        "type": "string",
-                        "example": "11.4"
-                    },
-                    "osBuild": {
-                        "type": "string",
-                        "example": "15F79"
-                    },
-                    "osSupplementalBuildVersion": {
-                        "type": "string",
-                        "description": "Collected for iOS 16 and iPadOS 16.1 or later",
-                        "example": "20B101"
-                    },
-                    "osRapidSecurityResponse": {
-                        "type": "string",
-                        "description": "Collected for iOS 16 and iPadOS 16.1 or later",
-                        "example": "(a)"
-                    },
-                    "softwareUpdateDeviceId": {
-                        "type": "string",
-                        "example": "J132AP"
-                    },
-                    "serialNumber": {
-                        "type": "string",
-                        "example": "DMQVGC0DHLF0"
-                    },
-                    "udid": {
-                        "type": "string",
-                        "example": "0dad565fb40b010a9e490440188063a378721069"
-                    },
-                    "ipAddress": {
-                        "type": "string",
-                        "example": "10.0.0.1"
-                    },
-                    "wifiMacAddress": {
-                        "type": "string",
-                        "example": "ee:00:7c:f0:e5:ff"
-                    },
-                    "bluetoothMacAddress": {
-                        "type": "string",
-                        "example": "ee:00:7c:f0:e5:aa"
-                    },
-                    "isManaged": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "initialEntryTimestamp": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2018-10-15T16:39:56.307Z"
-                    },
-                    "lastEnrollmentTimestamp": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2018-10-15T16:39:56.307Z"
-                    },
-                    "deviceOwnershipLevel": {
-                        "type": "string",
-                        "example": "institutional"
-                    },
-                    "site": {
-                        "$ref": "#/components/schemas/IdAndName"
-                    },
-                    "extensionAttributes": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ExtensionAttribute"
-                        }
-                    },
-                    "location": {
-                        "$ref": "#/components/schemas/Location"
-                    },
-                    "type": {
-                        "type": "string",
-                        "description": "Based on the value of this either ios, appleTv, android objects will be populated.",
-                        "example": "ios",
-                        "enum": [
-                            "ios",
-                            "appleTv",
-                            "android",
-                            "unknown"
-                        ]
-                    },
-                    "ios": {
-                        "$ref": "#/components/schemas/IosDetails"
-                    },
-                    "appleTv": {
-                        "$ref": "#/components/schemas/AppleTvDetails"
-                    },
-                    "android": {
-                        "$ref": "#/components/schemas/AndroidDetails"
-                    }
-                }
-            },
             "MobileDeviceDetailsGetV2": {
                 "allOf": [
                     {
@@ -44070,7 +44560,7 @@
                     },
                     "enforceName": {
                         "type": "boolean",
-                        "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the ���name��� value each time the device checks in.",
+                        "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the ‘name’ value each time the device checks in.",
                         "example": false
                     },
                     "assetTag": {
@@ -45066,6 +45556,42 @@
                             "userSessionTimeout": {
                                 "type": "integer",
                                 "example": 30
+                            },
+                            "prestageMinimumOsTargetVersionTypeIos": {
+                                "type": "string",
+                                "nullable": false,
+                                "example": "MINIMUM_OS_LATEST_VERSION",
+                                "enum": [
+                                    "NO_ENFORCEMENT",
+                                    "MINIMUM_OS_LATEST_VERSION",
+                                    "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                                    "MINIMUM_OS_LATEST_MINOR_VERSION",
+                                    "MINIMUM_OS_SPECIFIC_VERSION"
+                                ]
+                            },
+                            "minimumOsSpecificVersionIos": {
+                                "minLength": 0,
+                                "type": "string",
+                                "nullable": false,
+                                "example": "17.1"
+                            },
+                            "prestageMinimumOsTargetVersionTypeIpad": {
+                                "type": "string",
+                                "nullable": false,
+                                "example": "MINIMUM_OS_LATEST_VERSION",
+                                "enum": [
+                                    "NO_ENFORCEMENT",
+                                    "MINIMUM_OS_LATEST_VERSION",
+                                    "MINIMUM_OS_LATEST_MAJOR_VERSION",
+                                    "MINIMUM_OS_LATEST_MINOR_VERSION",
+                                    "MINIMUM_OS_SPECIFIC_VERSION"
+                                ]
+                            },
+                            "minimumOsSpecificVersionIpad": {
+                                "minLength": 0,
+                                "type": "string",
+                                "nullable": false,
+                                "example": "17.1"
                             }
                         }
                     }
@@ -45202,79 +45728,6 @@
                         "$ref": "#/components/schemas/MobileDeviceWatchOsInventory"
                     }
                 ]
-            },
-            "MobileDeviceSearchParams": {
-                "type": "object",
-                "properties": {
-                    "pageNumber": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "pageSize": {
-                        "type": "integer",
-                        "example": 100
-                    },
-                    "isLoadToEnd": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "orderBy": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OrderBy"
-                        }
-                    },
-                    "udid": {
-                        "type": "string",
-                        "example": "2b6f0cc904d137be2e1730235f5664094b831186"
-                    },
-                    "macAddress": {
-                        "type": "string",
-                        "example": "ee:00:7c:f0:e5:aa"
-                    },
-                    "name": {
-                        "type": "string",
-                        "example": "Jan's MObile Device"
-                    },
-                    "serialNumber": {
-                        "type": "string",
-                        "example": "C02L29ECF8J1"
-                    },
-                    "osType": {
-                        "type": "string",
-                        "example": "IOS"
-                    },
-                    "isManaged": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "excludedIds": {
-                        "type": "array",
-                        "example": [
-                            1,
-                            3
-                        ],
-                        "items": {
-                            "type": "integer"
-                        }
-                    }
-                }
-            },
-            "MobileDeviceSearchResults": {
-                "type": "object",
-                "properties": {
-                    "totalCount": {
-                        "minimum": 0,
-                        "type": "integer",
-                        "example": 3
-                    },
-                    "results": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/MobileDevice"
-                        }
-                    }
-                }
             },
             "MobileDeviceSearchResultsV2": {
                 "type": "object",
@@ -45730,75 +46183,6 @@
                     }
                 ]
             },
-            "Network": {
-                "type": "object",
-                "properties": {
-                    "cellularTechnology": {
-                        "type": "string",
-                        "example": "Unknown"
-                    },
-                    "isVoiceRoamingEnabled": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "imei": {
-                        "type": "string",
-                        "example": "59 105109 176278 3"
-                    },
-                    "iccid": {
-                        "type": "string",
-                        "example": "8991101200003204514"
-                    },
-                    "meid": {
-                        "type": "string",
-                        "example": "15302309236898"
-                    },
-                    "carrierSettingsVersion": {
-                        "type": "string",
-                        "example": "33.1"
-                    },
-                    "currentCarrierNetwork": {
-                        "type": "string",
-                        "example": "Verizon Wireless"
-                    },
-                    "currentMobileCountryCode": {
-                        "type": "string",
-                        "example": "311"
-                    },
-                    "currentMobileNetworkCode": {
-                        "type": "string",
-                        "example": "480"
-                    },
-                    "homeCarrierNetwork": {
-                        "type": "string",
-                        "example": "Verizon"
-                    },
-                    "homeMobileCountryCode": {
-                        "type": "string",
-                        "example": "US"
-                    },
-                    "homeMobileNetworkCode": {
-                        "type": "string",
-                        "example": "480"
-                    },
-                    "isDataRoamingEnabled": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "isRoaming": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isPersonalHotspotEnabled": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "phoneNumber": {
-                        "type": "string",
-                        "example": "555-555-5555 ext 5"
-                    }
-                }
-            },
             "NetworkV2": {
                 "type": "object",
                 "properties": {
@@ -45959,7 +46343,8 @@
                     "APP_INSTALLERS_NEW_APP_VERSION_DEPLOYMENT_STARTED",
                     "APP_INSTALLERS_APP_VERSION_REMOVED",
                     "APP_INSTALLERS_APP_TITLE_REMOVED",
-                    "APP_INSTALLERS_DEPLOYMENT_INSTALLATION_FAILED"
+                    "APP_INSTALLERS_DEPLOYMENT_INSTALLATION_FAILED",
+                    "SAML_RESPONSE_ASSERTION_SIGNING_REQUIRED"
                 ]
             },
             "NotificationV1": {
@@ -46190,23 +46575,6 @@
                         "type": "integer",
                         "nullable": false,
                         "example": 35
-                    }
-                }
-            },
-            "OrderBy": {
-                "type": "object",
-                "properties": {
-                    "field": {
-                        "type": "string",
-                        "example": "Name"
-                    },
-                    "direction": {
-                        "type": "string",
-                        "example": "DESC",
-                        "enum": [
-                            "ASC",
-                            "DESC"
-                        ]
                     }
                 }
             },
@@ -47257,15 +47625,22 @@
                             "LATEST_MINOR",
                             "LATEST_ANY",
                             "SPECIFIC_VERSION",
+                            "CUSTOM_VERSION",
                             "UNKNOWN"
                         ]
                     },
                     "specificVersion": {
                         "minLength": 0,
                         "type": "string",
-                        "description": "Optional. Indicates the specific version to update to. Only available when the version type is set to specific version, otherwise defaults to NO_SPECIFIC_VERSION.",
+                        "description": "Optional. Indicates the specific version to update to. Only available when the version type is set to specific version or custom version, otherwise defaults to NO_SPECIFIC_VERSION.",
                         "example": "12.6.1",
                         "default": "NO_SPECIFIC_VERSION"
+                    },
+                    "buildVersion": {
+                        "type": "string",
+                        "description": "Optional. Indicates the build version to update to. Only available when the version type is set to custom version.",
+                        "nullable": true,
+                        "example": "21F79"
                     },
                     "maxDeferrals": {
                         "minimum": 0,
@@ -47407,6 +47782,7 @@
                             "AcceptingPlan",
                             "RejectingPlan",
                             "ProcessingPlanType",
+                            "ProcessingPlanTypeMdm",
                             "StartingPlan",
                             "PlanFailed",
                             "SchedulingScanForOSUpdates",
@@ -47452,6 +47828,7 @@
                                 "NO_DISK_SPACE",
                                 "NO_UPDATES_AVAILABLE",
                                 "SPECIFIC_VERSION_UNAVAILABLE",
+                                "SPECIFIC_VERSION_UNAVAILABLE_FOR_DEVICE_MODEL",
                                 "ACTION_NOT_SUPPORTED_FOR_DEVICE_TYPE",
                                 "DECLARATIVE_DEVICE_MANAGEMENT_SOFTWARE_UPDATES_NOT_SUPPORTED_FOR_DEVICE_OS_VERSION",
                                 "DECLARATIVE_DEVICE_MANAGEMENT_SOFTWARE_UPDATES_NOT_SUPPORTED_FOR_DEVICE_TYPE",
@@ -47464,6 +47841,30 @@
                                 "DATA_INTEGRITY_VIOLATION_EXCEPTION",
                                 "ILLEGAL_ARGUMENT_EXCEPTION",
                                 "MDM_EXCEPTION",
+                                "INSTALL_REASON_UNKNOWN",
+                                "ACCEPT_PLAN_FAILURE",
+                                "SCHEDULE_PLAN_FAILURE",
+                                "REJECT_PLAN_FAILURE",
+                                "START_PLAN_FAILURE",
+                                "QUEUE_SCHEDULED_OS_UPDATE_SCAN_FAILURE",
+                                "SCAN_WAIT_FINISHED_FAILURE",
+                                "QUEUE_AVAILABLE_OS_UPDATE_COMMAND_FAILURE",
+                                "MDM_CLIENT_EXCEPTION",
+                                "QUEUE_SCHEDULE_OS_UPDATE_FAILURE",
+                                "QUEUE_OS_UPDATE_STATUS_COMMAND_FAILURE",
+                                "STILL_IN_PROGRESS_FAILURE",
+                                "WAIT_TO_COLLECT_OS_UPDATE_STATUS_FAILURE",
+                                "IS_DOWNLOADED_AND_NEEDS_INSTALL_FAILURE",
+                                "IS_INSTALLED_FAILURE",
+                                "IS_DOWNLOAD_ONLY_AND_DOWNLOADED_FAILURE",
+                                "VERIFY_INSTALLATION_FAILURE",
+                                "IS_MAC_OS_UPDATE_FAILURE",
+                                "IS_LATEST_FAILURE",
+                                "IS_SPECIFIC_VERSION_FAILURE",
+                                "HANDLE_COMMAND_QUEUE_FAILURE",
+                                "INVALID_CONFIGURATION_DECLARATION",
+                                "DECLARATIVE_DEVICE_MANAGEMENT_STATUS_RESPONSE_FAILURE_REASON_RECEIVED",
+                                "NO_DEVICE_STATUS_BY_GRACE_PERIOD",
                                 "UNKNOWN"
                             ]
                         }
@@ -48029,62 +48430,6 @@
                     }
                 }
             },
-            "Purchasing": {
-                "type": "object",
-                "properties": {
-                    "isPurchased": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "isLeased": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "poNumber": {
-                        "type": "string",
-                        "example": "8675309"
-                    },
-                    "vendor": {
-                        "type": "string",
-                        "example": "Apple"
-                    },
-                    "appleCareId": {
-                        "type": "string",
-                        "example": "9546567.0"
-                    },
-                    "purchasePrice": {
-                        "type": "string",
-                        "example": "$399"
-                    },
-                    "purchasingAccount": {
-                        "type": "string",
-                        "example": "IT Budget"
-                    },
-                    "poDate": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2019-02-04T21:09:31.661Z"
-                    },
-                    "warrantyExpiresDate": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2019-02-04T21:09:31.661Z"
-                    },
-                    "leaseExpiresDate": {
-                        "type": "string",
-                        "format": "date-time",
-                        "example": "2019-02-04T21:09:31.661Z"
-                    },
-                    "lifeExpectancy": {
-                        "type": "integer",
-                        "example": 7
-                    },
-                    "purchasingContact": {
-                        "type": "string",
-                        "example": "Nick in IT"
-                    }
-                }
-            },
             "PurchasingV2": {
                 "type": "object",
                 "properties": {
@@ -48264,6 +48609,10 @@
                         "default": false
                     },
                     "isFlushExtensionAttributesEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "isFlushSoftwareUpdatePlansEnabled": {
                         "type": "boolean",
                         "default": false
                     },
@@ -48603,47 +48952,6 @@
                     }
                 }
             },
-            "Security": {
-                "type": "object",
-                "properties": {
-                    "isDataProtected": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isBlockLevelEncryptionCapable": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "isFileLevelEncryptionCapable": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "isPasscodePresent": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isPasscodeCompliant": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "isPasscodeCompliantWithProfile": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "hardwareEncryption": {
-                        "type": "integer",
-                        "example": 3
-                    },
-                    "isActivationLockEnabled": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "isJailBreakDetected": {
-                        "type": "boolean",
-                        "example": false
-                    }
-                }
-            },
             "SecurityV2": {
                 "type": "object",
                 "properties": {
@@ -48766,6 +49074,11 @@
                     "allowRememberMe": {
                         "type": "boolean",
                         "description": "true if remember me functionality is allowed, false if not\n",
+                        "default": false
+                    },
+                    "useFido2": {
+                        "type": "boolean",
+                        "description": "true if use FIDO2 functionality is allowed, false if not\n",
                         "default": false
                     },
                     "authType": {
@@ -49336,6 +49649,104 @@
                     }
                 }
             },
+            "SlasaAcceptance": {
+                "type": "object",
+                "properties": {
+                    "slasaAcceptanceStatus": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "ACCEPTED",
+                        "enum": [
+                            "ACCEPTED",
+                            "NOT_ACCEPTED"
+                        ]
+                    }
+                }
+            },
+            "SmartComputerGroupPost": {
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "New Group Name"
+                    },
+                    "criteria": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SmartSearchCriterion"
+                        }
+                    },
+                    "siteId": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "-1"
+                    }
+                }
+            },
+            "SmartComputerGroupV2": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "minLength": 1,
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "1"
+                    },
+                    "siteId": {
+                        "minLength": 1,
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "1"
+                    },
+                    "name": {
+                        "minLength": 1,
+                        "type": "string",
+                        "example": "My computer group"
+                    },
+                    "membershipCount": {
+                        "type": "integer",
+                        "example": 231
+                    }
+                }
+            },
+            "SmartGroupMembership": {
+                "type": "object",
+                "properties": {
+                    "members": {
+                        "minLength": 0,
+                        "type": "array",
+                        "example": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "description": "the ids of the computers that are members of the smart group"
+            },
+            "SmartGroupSearchResult": {
+                "type": "object",
+                "properties": {
+                    "totalCount": {
+                        "minimum": 0,
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "results": {
+                        "minItems": 0,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SmartComputerGroupV2"
+                        }
+                    }
+                }
+            },
             "SmartSearchCriterion": {
                 "type": "object",
                 "properties": {
@@ -49425,6 +49836,56 @@
                         "type": "integer",
                         "example": 5,
                         "default": 5
+                    }
+                }
+            },
+            "SmtpGoogleMailAuthentication": {
+                "required": [
+                    "emailAddress",
+                    "status"
+                ],
+                "type": "object",
+                "properties": {
+                    "emailAddress": {
+                        "type": "string",
+                        "example": "exampleEmail@example.com",
+                        "default": ""
+                    },
+                    "status": {
+                        "type": "string",
+                        "readOnly": true,
+                        "example": "AUTHENTICATED",
+                        "enum": [
+                            "FAILED",
+                            "UNAUTHENTICATED",
+                            "AUTHENTICATED"
+                        ]
+                    }
+                }
+            },
+            "SmtpGoogleMailCredentials": {
+                "required": [
+                    "clientId",
+                    "clientSecret"
+                ],
+                "type": "object",
+                "properties": {
+                    "clientId": {
+                        "type": "string",
+                        "example": "012345678901-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
+                        "default": ""
+                    },
+                    "clientSecret": {
+                        "type": "string",
+                        "format": "password",
+                        "writeOnly": true,
+                        "default": ""
+                    },
+                    "authentications": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SmtpGoogleMailAuthentication"
+                        }
                     }
                 }
             },
@@ -49579,7 +50040,8 @@
                         "enum": [
                             "NONE",
                             "BASIC",
-                            "GRAPH_API"
+                            "GRAPH_API",
+                            "GOOGLE_MAIL"
                         ]
                     },
                     "connectionSettings": {
@@ -49593,6 +50055,9 @@
                     },
                     "graphApiCredentials": {
                         "$ref": "#/components/schemas/SmtpGraphApiCredentials"
+                    },
+                    "googleMailCredentials": {
+                        "$ref": "#/components/schemas/SmtpGoogleMailCredentials"
                     }
                 }
             },
@@ -50599,64 +51064,11 @@
                     }
                 }
             },
-            "UpdateAppleTv": {
-                "type": "object",
-                "properties": {
-                    "airplayPassword": {
-                        "type": "string",
-                        "format": "password",
-                        "example": "12345"
-                    },
-                    "purchasing": {
-                        "$ref": "#/components/schemas/Purchasing"
-                    }
-                }
-            },
-            "UpdateIos": {
-                "type": "object",
-                "properties": {
-                    "purchasing": {
-                        "$ref": "#/components/schemas/Purchasing"
-                    }
-                }
-            },
             "UpdateIosV2": {
                 "type": "object",
                 "properties": {
                     "purchasing": {
                         "$ref": "#/components/schemas/PurchasingV2"
-                    }
-                }
-            },
-            "UpdateMobileDevice": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "example": "Jan's Mobile Device"
-                    },
-                    "assetTag": {
-                        "type": "string",
-                        "example": "8675309"
-                    },
-                    "siteId": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "location": {
-                        "$ref": "#/components/schemas/Location"
-                    },
-                    "updatedExtensionAttributes": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ExtensionAttribute"
-                        }
-                    },
-                    "ios": {
-                        "$ref": "#/components/schemas/UpdateIos"
-                    },
-                    "appleTv": {
-                        "$ref": "#/components/schemas/UpdateAppleTv"
                     }
                 }
             },
@@ -50670,7 +51082,7 @@
                     },
                     "enforceName": {
                         "type": "boolean",
-                        "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the ���name��� value each time the device checks in.",
+                        "description": "Enforce the mobile device name. Device must be supervised. If set to true, Jamf Pro will revert the Mobile Device Name to the ‘name’ value each time the device checks in.",
                         "example": true
                     },
                     "assetTag": {
