@@ -44,7 +44,7 @@ function Connect-JamfPro {
         $Server = ConvertTo-FQDN $Server
         $uri_Auth      = "https://$Server/api/v1/auth/token"
         $uri_Verify    = "https://$Server/api/v1/auth"
-        $uri_Build     = "https://$Server/JSSCheckConnection"
+        $uri_Build     = "https://$Server/api/v1/jamf-pro-version"
         $uri_KeepAlive = "https://$Server/api/v1/auth/keep-alive"
         $app_Type   = "application/json"
         $app_Headers = @{
@@ -100,7 +100,7 @@ function Connect-JamfPro {
             try {
                 $VerifyAuth = Invoke-RestMethod $uri_Verify -Authentication Bearer -Token $Token.token -ContentType $app_Type -Headers $app_Headers
                 Set-Variable -Name 'TokenJamfPSPro' -Value $Token -Scope Global -Option ReadOnly -Description "Token for Jamf Pro API" -Force
-                $JamfBuild = Invoke-RestMethod $uri_Build -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method GET
+                $JamfBuild = (Invoke-RestMethod $uri_Build -Authentication Bearer -Token $TokenJamfPSPro.token -ContentType $app_Type -Headers $app_Headers -Method GET).version
             } catch {
                 $Error[0]
                 Write-Error "$($_.Exception.Response.StatusCode.value__): $($_.Exception.Response.StatusCode)"
