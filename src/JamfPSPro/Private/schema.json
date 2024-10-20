@@ -6347,6 +6347,57 @@
                 ]
             }
         },
+        "/v1/computer-inventory/{id}/remove-mdm-profile": {
+            "post": {
+                "tags": [
+                    "computer-inventory"
+                ],
+                "summary": "Remove a computer's MDM profile\n",
+                "description": "Remove a computer's MDM profile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the computer to remove the MDM profile from",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Command to remove the mdm profile was queued",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RemoveComputerMdmProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient privileges to perform this action."
+                    },
+                    "500": {
+                        "description": "Failure, unable to queue command.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Send Computer Unmanage Command"
+                ],
+                "x-action": true
+            }
+        },
         "/v1/computer-prestages/scope": {
             "get": {
                 "tags": [
@@ -7563,6 +7614,113 @@
                     }
                 },
                 "x-authentication-required": true
+            }
+        },
+        "/v1/ddm/{clientManagementId}/status-items": {
+            "get": {
+                "tags": [
+                    "declarative-device-management"
+                ],
+                "summary": "Retrieve the Status Items from the latest Status Report for a device",
+                "description": "Retrieves the Status Items from the latest Status Report for a device",
+                "parameters": [
+                    {
+                        "name": "clientManagementId",
+                        "in": "path",
+                        "description": "client management id of the target device.",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusItems"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The client could not be found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Mobile Devices",
+                    "Read Computers"
+                ]
+            }
+        },
+        "/v1/ddm/{clientManagementId}/status-items/{key}": {
+            "get": {
+                "tags": [
+                    "declarative-device-management"
+                ],
+                "summary": "Retrieve a Status Item from the latest Status Report for a device",
+                "description": "Retrieves a Status Item from the latest Status Report for a device",
+                "parameters": [
+                    {
+                        "name": "clientManagementId",
+                        "in": "path",
+                        "description": "client management id of the target device.",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "the status item key to retrieve.",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusItem"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The client or specified key could not be found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read Mobile Devices",
+                    "Read Computers"
+                ]
             }
         },
         "/v1/ddm/{clientManagementId}/sync": {
@@ -12990,6 +13148,35 @@
                 ]
             }
         },
+        "/v1/jcds/refresh-inventory": {
+            "post": {
+                "tags": [
+                    "jamf-content-distribution-server"
+                ],
+                "summary": "Refreshes the inventory and status of uploads in Jamf Pro.  This will update the \nstatus of uploads in the Jamf Pro database and allow the uploads to be deployed.\n",
+                "description": "Refreshes the inventory and status of uploads in Jamf Pro.  This will update the \nstatus of uploads in the Jamf Pro database and allow the uploads to be deployed.\n",
+                "responses": {
+                    "204": {
+                        "description": "Inventory refresh completed."
+                    },
+                    "500": {
+                        "description": "Failure, unable to complete inventory refresh.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-authentication-required": true,
+                "x-action": true,
+                "x-required-privileges": [
+                    "Read Jamf Content Distribution Server Files"
+                ]
+            }
+        },
         "/v1/jcds/renew-credentials": {
             "post": {
                 "tags": [
@@ -13151,356 +13338,6 @@
                 "x-required-privileges": [
                     "Read LDAP Servers"
                 ]
-            }
-        },
-        "/v1/local-admin-password/settings": {
-            "get": {
-                "tags": [
-                    "local-admin-password"
-                ],
-                "summary": "Get the current LAPS settings.",
-                "description": "Return information about the current LAPS settings.",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LapsSettingsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failure, unable to complete lookup.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "Update Local Admin Password Settings"
-                ],
-                "x-deprecation-date": "2023-03-13"
-            },
-            "put": {
-                "tags": [
-                    "local-admin-password"
-                ],
-                "summary": "Update settings for LAPS.",
-                "description": "Update settings for LAPS.",
-                "requestBody": {
-                    "description": "LAPS settings to update",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LapsSettingsRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LapsSettingsResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failure, unable to complete lookup.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "Update Local Admin Password Settings"
-                ],
-                "x-deprecation-date": "2023-03-13"
-            }
-        },
-        "/v1/local-admin-password/{clientManagementId}/account/{username}/audit": {
-            "get": {
-                "tags": [
-                    "local-admin-password"
-                ],
-                "summary": "Get LAPS password viewed history.",
-                "description": "Get the full history of all local admin passwords for a specific username on a target device. History will include password, who viewed the password and when it was viewed. Get audit history by using the client management id and username as the path parameters.",
-                "parameters": [
-                    {
-                        "name": "clientManagementId",
-                        "in": "path",
-                        "description": "client management id of target device.",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "user name to view audit information for",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LapsPasswordAuditsResults"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failure, unable to complete lookup.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "View Local Admin Password Audit History"
-                ],
-                "x-deprecation-date": "2023-03-13"
-            }
-        },
-        "/v1/local-admin-password/{clientManagementId}/account/{username}/password": {
-            "get": {
-                "tags": [
-                    "local-admin-password"
-                ],
-                "summary": "Get current LAPS password for specified username on a client.",
-                "description": "Get current LAPS password for specified client by using the client management id and username as the path parameters. Once the password is viewed it will be rotated out with a new password based on the rotation time settings.",
-                "parameters": [
-                    {
-                        "name": "clientManagementId",
-                        "in": "path",
-                        "description": "client management id of target device.",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "user name for the account",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LapsPasswordResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failure, unable to complete lookup.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "View Local Admin Password"
-                ],
-                "x-deprecation-date": "2023-03-13"
-            }
-        },
-        "/v1/local-admin-password/{clientManagementId}/accounts": {
-            "get": {
-                "tags": [
-                    "local-admin-password"
-                ],
-                "summary": "Get the LAPS capable admin accounts for a device.",
-                "description": "Get a full list of admin accounts that are LAPS capable. Capable accounts are returned in the AutoSetupAdminAccounts from QueryResponses.",
-                "parameters": [
-                    {
-                        "name": "clientManagementId",
-                        "in": "path",
-                        "description": "client management id of target device.",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LapsUserResults"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failure, unable to complete lookup.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "View Local Admin Password"
-                ],
-                "x-deprecation-date": "2023-03-13"
-            }
-        },
-        "/v1/local-admin-password/{clientManagementId}/set-password": {
-            "put": {
-                "tags": [
-                    "local-admin-password"
-                ],
-                "summary": "Set the LAPS password for a device.",
-                "description": "Set the LAPS password for a device. This will set the password for all LAPS capable accounts.",
-                "parameters": [
-                    {
-                        "name": "clientManagementId",
-                        "in": "path",
-                        "description": "client management id of target device.",
-                        "required": true,
-                        "style": "simple",
-                        "explode": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "description": "LAPS password to set",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/LapsUserPasswordRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LapsUserPasswordResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failure, unable to update passwords",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiError"
-                                }
-                            }
-                        }
-                    }
-                },
-                "deprecated": true,
-                "x-required-privileges": [
-                    "Send Local Admin Password Command"
-                ],
-                "x-deprecation-date": "2023-03-13"
             }
         },
         "/v1/locales": {
@@ -16210,6 +16047,154 @@
                 "x-required-privileges": [
                     "Dismiss Notifications"
                 ]
+            }
+        },
+        "/v1/oauth2/session-tokens": {
+            "get": {
+                "tags": [
+                    "sso-oauth-session-tokens"
+                ],
+                "summary": "Retrieve the access token and user information for the current session.\n",
+                "description": "Retrieve the access token and user information for the current session.",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OauthTokens"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to retrieve tokens"
+                    }
+                },
+                "x-authentication-required": true
+            }
+        },
+        "/v1/oidc/dispatch": {
+            "post": {
+                "tags": [
+                    "oidc"
+                ],
+                "summary": "Provide the url to redirect for OIDC login",
+                "description": "Provide the url to redirect for OIDC login based on email",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OidcLoginDispatchRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OidcLoginDispatchResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Email address or original URL parameter is invalid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Unexpected error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-action": true,
+                "x-authentication-required": false
+            }
+        },
+        "/v1/oidc/generate-certificate": {
+            "post": {
+                "tags": [
+                    "oidc"
+                ],
+                "summary": "Generate a new keystore used for signing OIDC messages\n",
+                "description": "Generates a new certificate used for signing OIDC messages",
+                "responses": {
+                    "201": {
+                        "description": "Successful response"
+                    },
+                    "503": {
+                        "description": "OIDC is disabled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ],
+                "x-action": true
+            }
+        },
+        "/v1/oidc/public-key": {
+            "get": {
+                "tags": [
+                    "oidc"
+                ],
+                "summary": "Get the public key of the keystore used for signing OIDC messages as a JWT\n",
+                "description": "Gets the public key of the keystore used for signing OIDC messages as a JWT",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OidcJwksResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Unable to retrieve OIDC certificate public key",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "OIDC is disabled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-authentication-required": false
             }
         },
         "/v1/onboarding": {
@@ -21157,8 +21142,7 @@
                                 "$ref": "#/components/schemas/SsoMetadataUrl"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "responses": {
                     "202": {
@@ -23910,7 +23894,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/SmartComputerGroupPost"
+                                "$ref": "#/components/schemas/SmartComputerGroupV2"
                             }
                         }
                     },
@@ -23930,6 +23914,101 @@
                 },
                 "x-required-privileges": [
                     "Create Smart Computer Groups"
+                ]
+            }
+        },
+        "/v2/computer-groups/smart-groups/{id}": {
+            "put": {
+                "tags": [
+                    "computer-groups"
+                ],
+                "summary": "Update a Smart Computer Group\n",
+                "description": "Updates a Smart Computer Group\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of target Smart Computer Group",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SmartComputerGroupV2"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful response - Smart Computer Group updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmartComputerGroupV2"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Target Smart Computer Group does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update Smart Computer Groups"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "computer-groups"
+                ],
+                "summary": "Remove specified Smart Computer Group\n",
+                "description": "Remove specified Smart Computer Group\n",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of target Smart Computer Group",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful response - Smart Computer Group removed"
+                    },
+                    "404": {
+                        "description": "Target Smart Computer Group does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Delete Smart Computer Groups"
                 ]
             }
         },
@@ -27659,7 +27738,7 @@
                     "mdm"
                 ],
                 "summary": "Post a command for creation and queuing\n",
-                "description": "Provided an MDM command type and appropriate information, will create and then queue said command.",
+                "description": "Provided an MDM command type and appropriate information, will create and then queue said command. A separate privilege is required for each device type and MDM command you want to view or send.",
                 "requestBody": {
                     "description": "The mdm command object to create and queue",
                     "content": {
@@ -28991,6 +29070,57 @@
                 "x-required-privileges": [
                     "Read Mobile Devices"
                 ]
+            }
+        },
+        "/v2/mobile-devices/{id}/unmanage": {
+            "post": {
+                "tags": [
+                    "mobile-devices"
+                ],
+                "summary": "Unmanage a Mobile Device\n",
+                "description": "Unmanage a Mobile Device",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id of the mobile device to remove the MDM profile from",
+                        "required": true,
+                        "style": "simple",
+                        "explode": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Command to remove the mdm profile was queued",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnmanageMobileDeviceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient privileges to perform this action."
+                    },
+                    "500": {
+                        "description": "Failure, unable to queue command.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Unmanage Mobile Devices"
+                ],
+                "x-action": true
             }
         },
         "/v2/patch-management-accept-disclaimer": {
@@ -30702,6 +30832,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -30744,6 +30876,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ]
@@ -30942,6 +31076,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -30962,6 +31098,8 @@
                         "description": "SSO object don't exist or is already disabled"
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ],
@@ -31024,6 +31162,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -31067,6 +31207,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ]
@@ -31092,6 +31234,8 @@
                         }
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Read SSO Settings"
                 ]
@@ -31112,8 +31256,7 @@
                                 "$ref": "#/components/schemas/SsoMetadataUrl"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "responses": {
                     "202": {
@@ -31123,6 +31266,8 @@
                         "description": "provided metadata URL is not valid"
                     }
                 },
+                "deprecated": true,
+                "x-deprecation-date": "2024-09-01",
                 "x-required-privileges": [
                     "Update SSO Settings"
                 ],
@@ -32140,6 +32285,245 @@
                 },
                 "x-required-privileges": [
                     "Update User-Initiated Enrollment"
+                ]
+            }
+        },
+        "/v3/sso": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Retrieve the current Single Sign On configuration settings\n",
+                "description": "Retrieves the current Single Sign On configuration settings",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SsoSettingsV3"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Updates the current Single Sign On configuration settings\n",
+                "description": "Updates the current Single Sign On configuration settings",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SsoSettingsV3"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The update was successful and the newly updated object is returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SsoSettingsV3"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Either required fields are missing or there was a validation exception.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ]
+            }
+        },
+        "/v3/sso/dependencies": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Retrieve the list of Enrollment Customizations using SSO\n",
+                "description": "Retrieves the list of Enrollment Customizations using SSO",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EnrollmentCustomizationDependencies"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
+                ]
+            }
+        },
+        "/v3/sso/disable": {
+            "post": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Disable SSO\n",
+                "description": "Disable SSO",
+                "responses": {
+                    "202": {
+                        "description": "SSO has been disabled"
+                    },
+                    "400": {
+                        "description": "SSO object don't exist or is already disabled"
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ],
+                "x-action": true
+            }
+        },
+        "/v3/sso/history": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Get SSO history object\n",
+                "description": "Gets SSO history object\n",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page-size"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sorting criteria in the format: property:asc/desc. Default sort is date:desc. Multiple sort criteria are supported and must be separated with a comma. Example: sort=date:desc,name:asc ",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": [
+                                "id:desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Query in the RSQL format, allowing to filter history notes collection. Default filter is empty query - returning all results for the requested page. Fields allowed in the query: username, date, note, details. This param can be combined with paging and sorting. Example: filter=username!=admin and details==*disabled* and date<2019-12-15",
+                        "required": false,
+                        "style": "form",
+                        "explode": true,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of SSO history were found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HistorySearchResults"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Add SSO history object notes\n",
+                "description": "Adds SSO history object notes",
+                "requestBody": {
+                    "description": "history notes to create",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ObjectHistoryNote"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notes of SSO history were added",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HrefResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "SSO object history can not be saved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Update SSO Settings"
+                ]
+            }
+        },
+        "/v3/sso/metadata/download": {
+            "get": {
+                "tags": [
+                    "sso-settings"
+                ],
+                "summary": "Download the Jamf Pro SAML metadata file\n",
+                "description": "Download the Jamf Pro SAML metadata file",
+                "responses": {
+                    "200": {
+                        "description": "Successful resposne",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-required-privileges": [
+                    "Read SSO Settings"
                 ]
             }
         },
@@ -33642,6 +34026,7 @@
                     "SYSTEM_ACCOUNT",
                     "USER_ENROLLMENT",
                     "CLIENT_CREDENTIALS",
+                    "OIDC",
                     "M2M"
                 ]
             },
@@ -37806,6 +38191,16 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "legacyJamfSalesforceIds": {
+                        "type": "array",
+                        "example": [
+                            "001C000000wkzXXXXX",
+                            "001C000000wkzYYYYY"
+                        ],
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -40409,9 +40804,6 @@
                 }
             },
             "EnrollmentSsoConfig": {
-                "required": [
-                    "hosts"
-                ],
                 "type": "object",
                 "properties": {
                     "hosts": {
@@ -42654,22 +43046,6 @@
                     }
                 }
             },
-            "LapsAudit": {
-                "type": "object",
-                "properties": {
-                    "viewedBy": {
-                        "type": "string",
-                        "nullable": true,
-                        "example": "admin"
-                    },
-                    "dateSeen": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true,
-                        "example": "2019-05-16T20:43:43.945Z"
-                    }
-                }
-            },
             "LapsAuditV2": {
                 "type": "object",
                 "properties": {
@@ -42736,37 +43112,6 @@
                     }
                 }
             },
-            "LapsPasswordAndAudits": {
-                "type": "object",
-                "properties": {
-                    "password": {
-                        "type": "string",
-                        "format": "password",
-                        "nullable": false,
-                        "readOnly": true,
-                        "example": "jamf12345"
-                    },
-                    "dateLastSeen": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true,
-                        "example": "2019-05-16T20:43:43.945Z"
-                    },
-                    "expirationTime": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true,
-                        "example": "2019-05-16T20:43:43.945Z"
-                    },
-                    "audits": {
-                        "minLength": 0,
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LapsAudit"
-                        }
-                    }
-                }
-            },
             "LapsPasswordAndAuditsV2": {
                 "type": "object",
                 "properties": {
@@ -42798,22 +43143,6 @@
                     }
                 }
             },
-            "LapsPasswordAuditsResults": {
-                "type": "object",
-                "properties": {
-                    "totalCount": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "results": {
-                        "minLength": 0,
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LapsPasswordAndAudits"
-                        }
-                    }
-                }
-            },
             "LapsPasswordAuditsResultsV2": {
                 "type": "object",
                 "properties": {
@@ -42827,18 +43156,6 @@
                         "items": {
                             "$ref": "#/components/schemas/LapsPasswordAndAuditsV2"
                         }
-                    }
-                }
-            },
-            "LapsPasswordResponse": {
-                "type": "object",
-                "properties": {
-                    "password": {
-                        "type": "string",
-                        "format": "password",
-                        "nullable": false,
-                        "readOnly": true,
-                        "example": "jamf12345"
                     }
                 }
             },
@@ -42884,32 +43201,6 @@
                     }
                 }
             },
-            "LapsSettingsRequest": {
-                "required": [
-                    "autoDeployEnabled",
-                    "autoExpirationTime",
-                    "passwordRotationTime"
-                ],
-                "type": "object",
-                "properties": {
-                    "autoDeployEnabled": {
-                        "type": "boolean",
-                        "description": "When enabled, all appropriate computers will have the SetAutoAdminPassword command sent to them automatically.",
-                        "nullable": false,
-                        "example": false
-                    },
-                    "passwordRotationTime": {
-                        "type": "integer",
-                        "description": "The amount of time in seconds that the local admin password will be rotated after viewing.",
-                        "example": 3600
-                    },
-                    "autoExpirationTime": {
-                        "type": "integer",
-                        "description": "The amount of time in seconds that the local admin password will be rotated automatically if it is never viewed.",
-                        "example": 7776000
-                    }
-                }
-            },
             "LapsSettingsRequestV2": {
                 "required": [
                     "autoDeployEnabled",
@@ -42943,27 +43234,6 @@
                     }
                 }
             },
-            "LapsSettingsResponse": {
-                "type": "object",
-                "properties": {
-                    "autoDeployEnabled": {
-                        "type": "boolean",
-                        "description": "When enabled, all appropriate computers will have the SetAutoAdminPassword command sent to them automatically.",
-                        "nullable": false,
-                        "example": false
-                    },
-                    "passwordRotationTime": {
-                        "type": "integer",
-                        "description": "The amount of time in seconds that the local admin password will be rotated after viewing.",
-                        "example": 3600
-                    },
-                    "autoExpirationTime": {
-                        "type": "integer",
-                        "description": "The amount of time in seconds that the local admin password will be rotated automatically if it is never viewed.",
-                        "example": 7776000
-                    }
-                }
-            },
             "LapsSettingsResponseV2": {
                 "type": "object",
                 "properties": {
@@ -42991,62 +43261,6 @@
                     }
                 }
             },
-            "LapsUser": {
-                "type": "object",
-                "properties": {
-                    "clientManagementId": {
-                        "type": "string",
-                        "example": "2db90ebf-ce9c-4078-b508-034c8ee3a060"
-                    },
-                    "guid": {
-                        "type": "string",
-                        "nullable": false,
-                        "example": "602F96A6-7BC4-43CD-95F2-1DD3B8BC0AF3"
-                    },
-                    "username": {
-                        "type": "string",
-                        "nullable": false,
-                        "example": "admin"
-                    },
-                    "userSource": {
-                        "type": "string",
-                        "example": "MDM",
-                        "enum": [
-                            "MDM",
-                            "JMF"
-                        ]
-                    }
-                }
-            },
-            "LapsUserPassword": {
-                "type": "object",
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "nullable": false,
-                        "example": "username"
-                    },
-                    "password": {
-                        "type": "string",
-                        "format": "password",
-                        "nullable": false,
-                        "writeOnly": true,
-                        "example": "jamf1234"
-                    }
-                }
-            },
-            "LapsUserPasswordRequest": {
-                "type": "object",
-                "properties": {
-                    "lapsUserPasswordList": {
-                        "minLength": 1,
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LapsUserPassword"
-                        }
-                    }
-                }
-            },
             "LapsUserPasswordRequestV2": {
                 "type": "object",
                 "properties": {
@@ -43055,18 +43269,6 @@
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/LapsUserPasswordV2"
-                        }
-                    }
-                }
-            },
-            "LapsUserPasswordResponse": {
-                "type": "object",
-                "properties": {
-                    "lapsUserPasswordList": {
-                        "type": "array",
-                        "nullable": false,
-                        "items": {
-                            "$ref": "#/components/schemas/LapsUserPassword"
                         }
                     }
                 }
@@ -43097,22 +43299,6 @@
                         "nullable": false,
                         "writeOnly": true,
                         "example": "jamf1234"
-                    }
-                }
-            },
-            "LapsUserResults": {
-                "type": "object",
-                "properties": {
-                    "totalCount": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "results": {
-                        "minLength": 0,
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LapsUser"
-                        }
                     }
                 }
             },
@@ -43591,6 +43777,14 @@
                     "brandingHeaderImageId": {
                         "type": "integer",
                         "example": 1
+                    },
+                    "homeHeading": {
+                        "type": "string",
+                        "example": "Welcome to Self Service"
+                    },
+                    "homeSubheading": {
+                        "type": "string",
+                        "example": "We help organizations succeed with Apple"
                     }
                 }
             },
@@ -46384,6 +46578,22 @@
                     }
                 }
             },
+            "OauthTokens": {
+                "type": "object",
+                "properties": {
+                    "accessToken": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6ImEyNDc2MmUwOTc1NDllMzIzZTVlYzY5OGE2Zjk0NjZiIn0.eyJodHRwczovL2V4YW1wbGUuY29tL2xhbmd1YWdlIjoiZW5fVVMiLCJodHRwczovL2V4YW1wbGUuY29tL3RpbWV6b25lIjoiRXVyb3BlL1dhcnNhdyIsImh0dHBzOi8vZXhhbXBsZS5jb20vY29ubmVjdGlvbl9uYW1lIjoiVGVzdC1hc2ZhZGZzZ3NkZmh5NjV6dHgzd3BnM2xiY28iLCJodHRwczovL2V4YW1wbGUuY29tL2lzX2phbWZfZW1wbG95ZWUiOmZhbHNlLCJpc3MiOiJodHRwczovL3Rlc3QuZW52LmF1dGgwLmNvbS8iLCJzdWIiOiJvaWRjfFRlc3QtYXNmYWRmc2dzZGZoeTY1enR4M3dwZzNsYmNvfDRwM3ItRkl4THVBREZydGRnYTM0ZGZTU29Xc0hFRUhhayIsImF1ZCI6WyJodHRwOi8vZXhhbXBsZS5jb20iLCJodHRwczovL3Rlc3QuZW52LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3MTUxOTM2NjYsImV4cCI6MTcxNTI4MDA2Niwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF6cCI6Ikh4ZVVqdDkxanFldHRXRXphck5nazBnbjdtWHYxbHBCUSJ9.D230129dYtmQLPYeZxKD2gBz9M3MA-8xpOg1IHMNpYgoK_zQLMwpNdWqdWO7xGPj2vc8xZOT6h0sY6pre15s_g"
+                    },
+                    "idToken": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6Ijg2YmY4MzVkOWM2NWM5Yzg3YzY0MmEyMGIzZjQzYzdkIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS9jb250YWN0X2lkIjoiMDAzVkUwMDAwMEF2VFFvWUFOIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS9hY2NvdW50X2lkIjoiMDAxOEowMDAwMEZCbzF1UUFEIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS9zdXBwb3J0X3BsYW4iOiJTdGFuZGFyZCIsImh0dHBzOi8vZXhhbXBsZS5jb20vY3JtX3JvbGUiOiJVbmtub3duIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS9maXJzdF9uYW1lIjoiV29ya2VyIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS9sYXN0X25hbWUiOiIxIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS9jb250YWN0X25hbWUiOiJVc2VyIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS9sYW5ndWFnZSI6ImVuX1VTIiwiaHR0cHM6Ly9leGFtcGxlLmNvbS90aW1lem9uZSI6IkV1cm9wZS9XYXJzYXciLCJodHRwczovL2V4YW1wbGUuY29tL2Nvbm5lY3Rpb25fbmFtZSI6IlRlc3RFbnYtNmRkb242dGFnaG9wZmQ1NnNkZzV6dHgzd3BnM2xiY28iLCJodHRwczovL2V4YW1wbGUuY29tL2lzX2phbWZfZW1wbG95ZWUiOmZhbHNlLCJuaWNrbmFtZSI6InVzZXItMSIsIm5hbWUiOiJVc2VyIiwicGljdHVyZSI6Imh0dHBzOi8vcy5ncmF2YXRhci5jb20vYXZhdGFyL3ZhdGFycyUyRncxLnBuZyIsInVwZGF0ZWRfYXQiOiIyMDI0LTA1LTE1VDE2OjEwOjI2LjUyMloiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJpc3MiOiJodHRwczovL3Rlc3QuZW52LmF1dGgwLmNvbS8iLCJhdWQiOiJIYXNkZnJ0NDM1MzRzZGZzYWFkZmZyNTQiLCJpYXQiOjE3MTU3ODk0MzcsImV4cCI6MTcxNTgyNTQzNywic3ViIjoib2lkY3xUZXN0RW52LTZkZG9uNnRhZ2hvcGZkNTZzZGc1enR4M3dwZzNsYmNvfDRwM3ItRkl4THVkYlRCLXNhZGZhbGtqNTM0c2RzZjM0NTU0MyIsInNpZCI6IjNLbnk5dTNPa2tGSEFTRDU1NXMxVDl1MENyX1ZVIiwibm9uY2UiOiJwUzBGcFR3NHBUWnMzRzVDQ0NkNE9hWFdTSXBUN0hWMmZ6SHF3cERWRWMifQ.e30.N2sF3wD4cHMnoi667YFNPK7u7UfOnxdbt7cZPPF3JJUw_UDeOhS5r7O6fyaQVD0VowLukQILVb_PdnxayNKYrg"
+                    }
+                },
+                "nullable": false
+            },
             "ObjectHistory": {
                 "type": "object",
                 "properties": {
@@ -46447,6 +46657,94 @@
                         "type": "string",
                         "nullable": true,
                         "example": "Is SSO Enabled false\\nSelected SSO Provider"
+                    }
+                }
+            },
+            "OidcJwksResponse": {
+                "type": "object",
+                "properties": {
+                    "keys": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "kty": {
+                                    "type": "string",
+                                    "example": "RSA"
+                                },
+                                "e": {
+                                    "type": "string",
+                                    "example": "AQAB"
+                                },
+                                "use": {
+                                    "type": "string",
+                                    "example": "sig"
+                                },
+                                "kid": {
+                                    "type": "string",
+                                    "example": "695eccd8c1918105c0f57fcac412651245d778cd301fca44a5ee6f7e0c5320ce"
+                                },
+                                "alg": {
+                                    "type": "string",
+                                    "example": "RS256"
+                                },
+                                "iat": {
+                                    "type": "integer",
+                                    "example": 1717518913
+                                },
+                                "n": {
+                                    "type": "string",
+                                    "example": "yvoRJjwm_JR3z0_MQS5zU8RQCav82PbdZOG8DYcDzRrbklVJZXAGOH16m6egW5B-hb_zxncsSCZTvwmXYiUsWcYE8Lu-CZ0-O2WmpOsk-rc5mklQlEGlD2N3u6MZWIpOofyrbM2AhVssmzgFRHR_22O05KDsNKMKy7ZQaUvvIbqBrnvGRKJMZ4GqzeWyo3rmBpdhmY1wLoPQBAQgwO-TTy5xLhTmLLimAV6ckkLtxjUUdwu4pSKiiJGkJAlDEFXJA5-Y9GE3CZOywj1sJsuHvfHGcgWbEDYVVqdD6PB4NRKmuvj_yJ1BACObaFSLNzfw693FBvuyH1s9D-zGT58Kvw"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "OidcLoginDispatchRequest": {
+                "required": [
+                    "emailAddress",
+                    "originalUrl"
+                ],
+                "type": "object",
+                "properties": {
+                    "originalUrl": {
+                        "type": "string",
+                        "description": "Original Url",
+                        "example": "aHR0cHM6Ly9qYW1mLXByby11cmwuY29tL2xvZ2dpbmcuaHRtbA=="
+                    },
+                    "emailAddress": {
+                        "type": "string",
+                        "description": "User email address",
+                        "example": "admin@domain.name"
+                    }
+                }
+            },
+            "OidcLoginDispatchResponse": {
+                "required": [
+                    "redirectUrl"
+                ],
+                "type": "object",
+                "properties": {
+                    "redirectUrl": {
+                        "type": "string",
+                        "example": "/oauth2/authorization/jamf-account-domain.name?original_url=aHR0cHM6Ly9qYW1mLXByby11cmwuY29tL2xvZ2dpbmcuaHRtbA==&login_hint=YWRtaW5AZG9tYWluLm5hbWU="
+                    }
+                }
+            },
+            "OidcSettings": {
+                "required": [
+                    "userMapping"
+                ],
+                "type": "object",
+                "properties": {
+                    "userMapping": {
+                        "type": "string",
+                        "example": "USERNAME",
+                        "enum": [
+                            "USERNAME",
+                            "EMAIL"
+                        ]
                     }
                 }
             },
@@ -48670,6 +48968,21 @@
                 },
                 "description": "A list with Remote administration configurations"
             },
+            "RemoveComputerMdmProfileResponse": {
+                "type": "object",
+                "properties": {
+                    "deviceId": {
+                        "type": "string",
+                        "description": "Id of the computer whose MDM profile was removed",
+                        "example": "1234"
+                    },
+                    "commandUuid": {
+                        "type": "string",
+                        "description": "Uuid of the command queued that removes the MDM profile",
+                        "example": "1234-5678-90ab-cdef-1234567890ab"
+                    }
+                }
+            },
             "RenewMdmProfileResponse": {
                 "type": "object",
                 "properties": {
@@ -48778,6 +49091,90 @@
                     "bundleId": {
                         "type": "string",
                         "example": "com.jamf.parent"
+                    }
+                }
+            },
+            "SamlSettings": {
+                "type": "object",
+                "properties": {
+                    "tokenExpirationDisabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "userAttributeEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "userAttributeName": {
+                        "type": "string",
+                        "default": " "
+                    },
+                    "userMapping": {
+                        "type": "string",
+                        "example": "USERNAME",
+                        "enum": [
+                            "USERNAME",
+                            "EMAIL"
+                        ]
+                    },
+                    "groupAttributeName": {
+                        "type": "string",
+                        "default": "http://schemas.xmlsoap.org/claims/Group"
+                    },
+                    "groupRdnKey": {
+                        "type": "string",
+                        "default": " "
+                    },
+                    "idpProviderType": {
+                        "type": "string",
+                        "example": "ADFS",
+                        "enum": [
+                            "ADFS",
+                            "OKTA",
+                            "GOOGLE",
+                            "SHIBBOLETH",
+                            "ONELOGIN",
+                            "PING",
+                            "CENTRIFY",
+                            "AZURE",
+                            "OTHER"
+                        ]
+                    },
+                    "idpUrl": {
+                        "type": "string",
+                        "example": "https://example.idp.com/app/id/sso/saml/metadata"
+                    },
+                    "entityId": {
+                        "type": "string",
+                        "example": "saml/metadata"
+                    },
+                    "metadataFileName": {
+                        "type": "string",
+                        "example": "if MetadataSource is set to URL, remove this field"
+                    },
+                    "otherProviderTypeName": {
+                        "type": "string",
+                        "default": " "
+                    },
+                    "federationMetadataFile": {
+                        "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+                        "type": "string",
+                        "format": "byte",
+                        "example": "WlhoaGJYQnNaU0J2WmlCaElHSmhjMlUyTkNCbGJtTnZaR1ZrSUhaaGJHbGtJSEF4TWk0Z2EyVjVjM1J2Y21VZ1ptbHNaUT09"
+                    },
+                    "metadataSource": {
+                        "type": "string",
+                        "example": "URL",
+                        "enum": [
+                            "URL",
+                            "FILE",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "sessionTimeout": {
+                        "type": "integer",
+                        "format": "int32",
+                        "default": 480
                     }
                 }
             },
@@ -49663,30 +50060,7 @@
                     }
                 }
             },
-            "SmartComputerGroupPost": {
-                "required": [
-                    "name"
-                ],
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "example": "New Group Name"
-                    },
-                    "criteria": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/SmartSearchCriterion"
-                        }
-                    },
-                    "siteId": {
-                        "type": "string",
-                        "nullable": true,
-                        "example": "-1"
-                    }
-                }
-            },
-            "SmartComputerGroupV2": {
+            "SmartComputerGroupSearch": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -49709,6 +50083,29 @@
                     "membershipCount": {
                         "type": "integer",
                         "example": 231
+                    }
+                }
+            },
+            "SmartComputerGroupV2": {
+                "required": [
+                    "name"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "New Group Name"
+                    },
+                    "criteria": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SmartSearchCriterion"
+                        }
+                    },
+                    "siteId": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": "-1"
                     }
                 }
             },
@@ -49742,7 +50139,7 @@
                         "minItems": 0,
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/SmartComputerGroupV2"
+                            "$ref": "#/components/schemas/SmartComputerGroupSearch"
                         }
                     }
                 }
@@ -50588,6 +50985,68 @@
                     }
                 }
             },
+            "SsoSettingsV3": {
+                "required": [
+                    "configurationType",
+                    "enrollmentSsoForAccountDrivenEnrollmentEnabled",
+                    "groupEnrollmentAccessEnabled",
+                    "oidcSettings",
+                    "samlSettings",
+                    "ssoBypassAllowed",
+                    "ssoEnabled",
+                    "ssoForEnrollmentEnabled",
+                    "ssoForMacOsSelfServiceEnabled"
+                ],
+                "type": "object",
+                "properties": {
+                    "configurationType": {
+                        "type": "string",
+                        "example": "SAML",
+                        "enum": [
+                            "SAML",
+                            "OIDC",
+                            "OIDC_WITH_SAML"
+                        ]
+                    },
+                    "oidcSettings": {
+                        "$ref": "#/components/schemas/OidcSettings"
+                    },
+                    "samlSettings": {
+                        "$ref": "#/components/schemas/SamlSettings"
+                    },
+                    "ssoForEnrollmentEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "ssoBypassAllowed": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "ssoEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "ssoForMacOsSelfServiceEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "enrollmentSsoForAccountDrivenEnrollmentEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "enrollmentSsoConfig": {
+                        "$ref": "#/components/schemas/EnrollmentSsoConfig"
+                    },
+                    "groupEnrollmentAccessEnabled": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "groupEnrollmentAccessName": {
+                        "type": "string",
+                        "default": " "
+                    }
+                }
+            },
             "StartupStatus": {
                 "type": "object",
                 "properties": {
@@ -50779,6 +51238,42 @@
                     "name": {
                         "type": "string",
                         "example": "Grade School Teachers"
+                    }
+                }
+            },
+            "StatusItem": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The StatusItem key",
+                        "nullable": false,
+                        "example": "device.identifier.udid"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The StatusItem value",
+                        "nullable": false,
+                        "example": "00008103-000C51E402E2001E"
+                    },
+                    "lastUpdateTime": {
+                        "type": "string",
+                        "description": "The local server time when the StatusItem was last updated",
+                        "nullable": false,
+                        "example": "2024-08-25T21:09:31"
+                    }
+                }
+            },
+            "StatusItems": {
+                "type": "object",
+                "properties": {
+                    "statusItems": {
+                        "type": "array",
+                        "nullable": false,
+                        "items": {
+                            "$ref": "#/components/schemas/StatusItem"
+                        },
+                        "default": []
                     }
                 }
             },
@@ -51061,6 +51556,25 @@
                             "type": "string",
                             "example": "6E47EF55-5318-494F-A09E-70F613E0AFD1"
                         }
+                    }
+                }
+            },
+            "UnmanageMobileDeviceResponse": {
+                "required": [
+                    "commandUuid",
+                    "deviceId"
+                ],
+                "type": "object",
+                "properties": {
+                    "deviceId": {
+                        "type": "string",
+                        "description": "Id of the mobile device whose MDM profile was removed",
+                        "example": "1234"
+                    },
+                    "commandUuid": {
+                        "type": "string",
+                        "description": "Uuid of the command queued that removes the MDM profile",
+                        "example": "1234-5678-90ab-cdef-1234567890ab"
                     }
                 }
             },
@@ -51364,21 +51878,6 @@
                     "name": {
                         "type": "string",
                         "example": "Venafi Certificate Authority"
-                    },
-                    "username": {
-                        "type": "string",
-                        "example": "username"
-                    },
-                    "password": {
-                        "type": "string",
-                        "format": "password",
-                        "writeOnly": true,
-                        "example": "password"
-                    },
-                    "passwordConfigured": {
-                        "type": "boolean",
-                        "readOnly": true,
-                        "example": true
                     },
                     "proxyAddress": {
                         "type": "string",
