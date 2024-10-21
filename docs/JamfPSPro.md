@@ -2,7 +2,7 @@
 Module Name: JamfPSPro
 Module Guid: 9133a5ba-2ce3-4ee0-b114-c97577149383
 Download Help Link: NA
-Help Version: 1.3.0
+Help Version: 1.3.3
 Locale: en-US
 ---
 
@@ -16,6 +16,12 @@ Connects to JamfPro
 
 ### [Get-Jamf](Get-Jamf.md)
 Retrieve data from Jamf Pro.
+
+### [Get-ValidJamfOption](Get-ValidJamfOption.md)
+Retrieve a valid Jamf api call.
+
+### [Invoke-JamfAPICall](Invoke-JamfAPICall.md)
+Invokes a Jamf api call.
 
 ### [New-Jamf](New-Jamf.md)
 Create a new resource or record in Jamf Pro.

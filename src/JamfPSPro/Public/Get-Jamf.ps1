@@ -48,7 +48,7 @@ function Get-Jamf {
         [String[]]$Params
     )
     DynamicParam {
-        $ValidOptions = @( Get-ValidOption -Method 'get' -Component $Component )
+        $ValidOptions = @( Get-ValidJamfOption -Method 'get' -Component $Component )
         Get-DynamicParam -Name Select -ValidateSet $ValidOptions.Option -Mandatory -Position 1 -HelpMessage "Specify the selection method of the 'component path'"
     }
     BEGIN {
@@ -74,15 +74,15 @@ function Get-Jamf {
         if ( $MatchType -match '1-1|Many-Many' ) {
             Write-Debug "1-1|Many-Many"
             foreach ( $Replacement in $ReplaceMatches.Matches.value ) {
-                Write-Debug "Path: $RestURL"
                 $MatchIndex = [array]::IndexOf($ReplaceMatches.Matches.value, $Replacement)
                 $RestURL = $RestURL -replace $Replacement, $Params[$MatchIndex]
+                Write-Debug "Path: $RestURL"
             }
         } elseif ( $MatchType -match '1-Many|Many-More' ) {
             Write-Debug "1-Many|Many-More"
             for ( ($i = 0); $i -lt ($ReplaceMatches.Matches.Count - 1); $i++ ) {
-                Write-Debug "Path: $RestURL"
                 $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, $Params[$i]
+                Write-Debug "Path: $RestURL"
             }
             if ( $ReplaceMatches.Matches[$i].value -match 'list' ) {
                 $RestURL = $RestURL -replace $ReplaceMatches.Matches[$i].value, ($Params[$i..($Params.count)] -join ',')
