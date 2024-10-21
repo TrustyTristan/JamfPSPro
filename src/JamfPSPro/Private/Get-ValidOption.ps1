@@ -95,7 +95,12 @@ function Get-ValidOption {
         }
         Clear-Variable -Name Schema
     
-        return $Results | Group-Object Option | ForEach-Object {$_.Group | Select-Object -Last 1} 
+        if ( $Component ) {
+            return $Results | Where-Object { $_.Component -notin @($null,'','{id}')} | Group-Object Option | ForEach-Object {$_.Group | Select-Object -Last 1}
+        } else {
+            return $Results | Where-Object { $_.Component -notin @($null,'','{id}')}
+        }
+
     }
 
 }
