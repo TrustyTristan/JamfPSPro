@@ -10,8 +10,12 @@ function ConvertTo-FQDN {
     )
     PROCESS {
         foreach ($url in $String) {
-            if ($url -match "(?:https?://)?(?:www\d?\.)?(?<domain>[-\w.]+)") {
-                return $matches["domain"]
+            if ($url -match "(?:https?://)?(?:www\d?\.)?(?<domain>[-\w.]+)(?<port>:[0-9]+)?") {
+                if ($matches["port"]) {
+                    return $matches["domain"] + $matches["port"]
+                } else {
+                    return $matches["domain"]
+                }
             }
         }
     }
